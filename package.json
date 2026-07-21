@@ -1,0 +1,75 @@
+{
+  "name": "solarotrade-quantum-suite",
+  "productName": "SolaroTrade Quantum Suite",
+  "version": "1.0.0",
+  "description": "Suite de análisis macro cuántico — datos reales FRED, motor Hamiltoniano φ⁴, IA Pollinations",
+  "main": "main.js",
+  "author": {
+    "name": "SolaroTrade",
+    "email": "dev@solarotrade.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build:win": "electron-builder --win --x64",
+    "build:all": "electron-builder --win --mac --linux",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.solarotrade.quantum-suite",
+    "productName": "SolaroTrade Quantum Suite",
+    "copyright": "Copyright © 2025 SolaroTrade",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "publisherName": "SolaroTrade",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SolaroTrade Quantum Suite",
+      "include": "scripts/installer.nsh"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "puenteprod06-bit",
+      "repo": "Quantum-suite",
+      "releaseType": "release"
+    }
+  }
+}

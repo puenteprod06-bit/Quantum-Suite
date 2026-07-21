@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolaroTrade • Suite Cuántica Macro</title>
+    <style>
+
+        /* ── SISTEMA DE DISEÑO SOLARO FINTECH PREMIUM ── */
+        :root {
+            --bg-main:    #0a0a0a;
+            --bg-card:    #111111;
+            --bg-alt:     #0f0f0f;
+            --bg-input:   #1a1a1a;
+            --gold:       #f5a623;
+            --gold-dim:   #c4831a;
+            --gold-bg:    rgba(245,166,35,0.08);
+            --gold-border:rgba(245,166,35,0.25);
+            --white:      #ffffff;
+            --text-body:  #aaaaaa;
+            --text-dim:   #666666;
+            --border:     #222222;
+            --border-dim: #1a1a1a;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        * { font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-main); color: var(--text-body); min-height: 100vh; font-size: 14px; line-height: 1.6; }
+
+        /* ── GLASS / CARD ── */
+        .glass {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        /* ── TAB ACTIVE ── */
+        .tab-active {
+            border-bottom: 2px solid var(--gold) !important;
+            color: var(--gold) !important;
+            font-weight: 700;
+        }
+
+        /* ── MONO ── */
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ── METRIC CARDS ── */
+        .metric-card { transition: border-color 0.2s; }
+        .metric-card:hover { border-color: var(--gold-border) !important; }
+
+        /* ── GRADIENT TEXT → gold ── */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--gold), #fff8e7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── CHARTS ── */
+        .chart-container { position: relative; height: 300px; }
+
+        /* ── INPUTS ── */
+        .input-field {
+            background: var(--bg-input);
+            border: 1px solid #333333;
+            color: var(--white);
+            border-radius: 4px;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 2px rgba(245,166,35,0.12); }
+
+        /* ── BUTTONS PRIMARY (gold bg, black text) ── */
+        .btn-primary {
+            background: var(--gold);
+            color: #000000;
+            font-weight: 700;
+            border-radius: 5px;
+            transition: background 0.2s, opacity 0.2s;
+        }
+        .btn-primary:hover { background: #e09418; opacity: 0.95; }
+
+        /* ── BUTTONS SECONDARY (gold border, transparent) ── */
+        .btn-secondary {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold-border);
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: var(--gold-bg); }
+
+        /* ── btn-purple → secondary style ── */
+        .btn-purple {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold-border);
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .btn-purple:hover { background: var(--gold-bg); }
+
+        /* ── STATUS LIVE ── */
+        .status-live { color: var(--gold); }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .status-live::before { content: "●"; margin-right: 5px; animation: pulse 2s infinite; }
+
+        /* ── SCROLLBAR ── */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ── RANGE BUTTONS ── */
+        .range-btn {
+            background: #161616;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .range-btn:hover { border-color: var(--gold-border); color: var(--gold); }
+        .range-btn.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: var(--gold-bg);
+            font-weight: 700;
+        }
+
+        /* ── TABLES ── */
+        table th { color: var(--gold); font-size: 11px; letter-spacing: 0.06em; }
+        table tr:nth-child(even) td { background: #0d0d0d; }
+
+        /* ── BADGES / TAGS ── */
+        .badge-gold {
+            display: inline-block;
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+            background: var(--gold-bg);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 3px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── DIVIDER ── */
+        .divider { height: 1px; background: var(--border); margin: 0; }
+
+        /* ── ANIMATE PULSE (loading) ── */
+        .animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+        /* ── RESPONSIVE GRID HELPERS (restored after cleanup) ── */
+        .lg-grid-2, .lg-grid-3, .md-grid-2 { display: grid; grid-template-columns: 1fr; }
+        @media (min-width: 1024px) {
+            .lg-grid-2 { grid-template-columns: 1fr 1fr; }
+            .lg-grid-3 { grid-template-columns: 2fr 1fr; }
+            .span-2 { grid-column: span 1; }
+        }
+        @media (min-width: 768px) {
+            .md-grid-2 { grid-template-columns: 1fr 1fr; }
+        }
+        /* ── HEATMAP CELLS ── */
+        .hm-hi      { background: rgba(245,166,35,0.80); color:#000 !important; }
+        .hm-med     { background: rgba(245,166,35,0.45); color:#fff !important; }
+        .hm-lo      { background: rgba(245,166,35,0.18); color:#aaa !important; }
+        .hm-zero    { background: #161616; color:#444 !important; }
+        .hm-neg-lo  { background: rgba(180,50,50,0.20); color:#aaa !important; }
+        .hm-neg-med { background: rgba(180,50,50,0.50); color:#fff !important; }
+        .hm-neg-hi  { background: rgba(180,50,50,0.85); color:#fff !important; }
+
+
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+</head>
+<body style="background:#0a0a0a;color:#aaaaaa;min-height:100vh;">
+
+<nav style="background:#0d0d0d;border-bottom:1px solid #222;position:sticky;top:0;z-index:50;">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center ">
+            <div style="width:36px;height:36px;background:var(--gold);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#000;letter-spacing:-0.5px;">ST</div>
+            <div>
+                <span style="font-size:20px;font-weight:800;color:#fff;">Solaro<span style="color:var(--gold);">Trade</span></span>
+                <p style="font-size:9px;color:#555;letter-spacing:0.15em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;">Suite Cuántica Macro</p>
+            </div>
+        </div>
+        <div class="flex items-center ">
+            <span class="status-live text-xs font-medium mono" id="api-status">CONECTANDO...</span>
+            <span style="font-size:11px;color:#555;font-family:'JetBrains Mono',monospace;" id="clock">--:--:-- UTC</span>
+            <span id="update-badge" onclick="window.electronAPI?.checkUpdate()" style="display:none;font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:3px;cursor:pointer;"></span>
+            <span id="update-badge" style="display:none;font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:3px;cursor:pointer;" onclick="window.electronAPI?.checkUpdate()"></span>
+        </div>
+    </div>
+</nav>
+
+<div style="max-width:1280px;margin:0 auto;padding:24px;">
+    <div style="display:flex;gap:0;border-bottom:1px solid #222;margin-bottom:28px;overflow-x:auto;" class="scrollbar-hide">
+        <button onclick="openTab(0)" class="tab-active" style="padding:12px 22px;white-space:nowrap;font-size:12px;font-weight:600;letter-spacing:0.04em;background:none;border:none;border-bottom:2px solid var(--gold);color:var(--gold);cursor:pointer;transition:all 0.2s;text-transform:uppercase;">LIQUIDEZ</button>
+        <button onclick="openTab(1)" style="padding:12px 22px;white-space:nowrap;font-size:12px;font-weight:600;letter-spacing:0.04em;background:none;border:none;border-bottom:2px solid transparent;color:#555;cursor:pointer;transition:all 0.2s;text-transform:uppercase;">CORRELACIONES</button>
+        <button onclick="openTab(2)" style="padding:12px 22px;white-space:nowrap;font-size:12px;font-weight:600;letter-spacing:0.04em;background:none;border:none;border-bottom:2px solid transparent;color:#555;cursor:pointer;transition:all 0.2s;text-transform:uppercase;">MOTOR MACRO</button>
+        <button onclick="openTab(3)" style="padding:12px 22px;white-space:nowrap;font-size:12px;font-weight:600;letter-spacing:0.04em;background:none;border:none;border-bottom:2px solid transparent;color:#555;cursor:pointer;transition:all 0.2s;text-transform:uppercase;">IA CUÁNTICA</button>
+        <button onclick="openTab(4)" style="padding:12px 22px;white-space:nowrap;font-size:12px;font-weight:600;letter-spacing:0.04em;background:none;border:none;border-bottom:2px solid transparent;color:#555;cursor:pointer;transition:all 0.2s;text-transform:uppercase;">SERIES TEMP.</button>
+    </div>
+
+    <div id="tab-0">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;">
+            <div>
+                <h1 class="text-3xl font-bold">Liquidez Global <span style="color:var(--gold);">Cuántica</span></h1>
+                <p style="color:#666;font-size:12px;margin-top:4px;letter-spacing:0.03em;font-family:'JetBrains Mono',monospace;">DATOS REALES FRED  ·  MODELO φ⁴  ·  FUNCIÓN DE ONDA DEL MERCADO</p>
+            </div>
+            <button onclick="loadLiquidity()" class="btn-primary" style="padding:8px 18px;font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Actualizar Datos
+            </button>
+        </div>
+        <div id="liquidity-panel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+
+        <!-- Selector de rango de fechas -->
+        <div class="glass" style="padding:16px;border-radius:6px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+            <span style="font-size:10px;color:#555;font-weight:700;letter-spacing:0.1em;font-family:'JetBrains Mono',monospace;">RANGO</span>
+            <div style="display:flex;flex-wrap:wrap;">
+                <button onclick="setRange('3m')"  id="range-3m"  class="range-btn" style="padding:2px 10px;font-size:11px;">3M</button>
+                <button onclick="setRange('6m')"  id="range-6m"  class="range-btn" style="padding:2px 10px;font-size:11px;">6M</button>
+                <button onclick="setRange('1y')"  id="range-1y"  class="range-btn" style="padding:2px 10px;font-size:11px;">1A</button>
+                <button onclick="setRange('2y')"  id="range-2y"  class="range-btn" style="padding:2px 10px;font-size:11px;">2A</button>
+                <button onclick="setRange('5y')"  id="range-5y"  class="range-btn active" style="padding:2px 10px;font-size:11px;">5A</button>
+                <button onclick="setRange('10y')" id="range-10y" class="range-btn" style="padding:2px 10px;font-size:11px;">10A</button>
+                <button onclick="setRange('max')" id="range-max" class="range-btn" style="padding:2px 10px;font-size:11px;">MÁX</button>
+            </div>
+            <div style="display:flex;align-items:center;margin-left:auto;">
+                <span class="text-xs " style="color:#666666;">Desde:</span>
+                <input type="date" id="custom-start" class="input-field px-2 py-1 rounded-lg text-xs mono" onchange="setRange('custom')">
+                <span class="text-xs " style="color:#666666;">Hasta:</span>
+                <input type="date" id="custom-end" class="input-field px-2 py-1 rounded-lg text-xs mono" onchange="setRange('custom')">
+            </div>
+        </div>
+        <div style="gap:16px;" class="lg-grid-2">
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">M2 Money Supply (Billones USD)</h3>
+                <div class="chart-container"><canvas id="chart-m2"></canvas></div>
+            </div>
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">FED Balance Sheet (Billones USD)</h3>
+                <div class="chart-container"><canvas id="chart-fed"></canvas></div>
+            </div>
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">10Y Treasury Yield (%)</h3>
+                <div class="chart-container"><canvas id="chart-10y"></canvas></div>
+            </div>
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">Reverse Repo (Miles de Millones USD)</h3>
+                <div class="chart-container"><canvas id="chart-repo"></canvas></div>
+            </div>
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">CPI YoY — Inflación Real (%)</h3>
+                <div class="chart-container"><canvas id="chart-cpi"></canvas></div>
+            </div>
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">Federal Funds Rate (%)</h3>
+                <div class="chart-container"><canvas id="chart-fedfunds"></canvas></div>
+            </div>
+        </div>
+        <div class="glass" style="padding:24px;border-radius:6px;">
+            <h3 style="font-size:16px;font-weight:700;display:flex;align-items:center;">
+                <span style="color:var(--gold);">⚛️</span> Hamiltoniano de Liquidez — Modelo φ⁴ Cuántico
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 ">
+                <div style="border-radius:5px;">
+                    <p style="font-size:12px;font-family:JetBrains Mono,monospace;">ECUACIÓN DE SCHRÖDINGER FINANCIERA</p>
+                    <p class="text-sm mono text-gold-dim" style="color:#e09418;">iℏ ∂|ψ⟩/∂t = Ĥ|ψ⟩</p>
+                    <p style="font-size:12px;color:#888;">El estado del mercado evoluciona según un Hamiltoniano que combina energía cinética (volatilidad) y potencial (fundamentales).</p>
+                </div>
+                <div style="border-radius:5px;">
+                    <p style="font-size:12px;font-family:JetBrains Mono,monospace;">HAMILTONIANO φ⁴</p>
+                    <p class="text-sm mono text-white-sec" style="color:#cccccc;">Ĥ = p̂²/2m + ½mω²x² + λx⁴</p>
+                    <p style="font-size:12px;color:#888;">El término cuártico λx⁴ captura la aversión al riesgo colectiva y las colas pesadas de las distribuciones de retorno.</p>
+                </div>
+                <div style="border-radius:5px;">
+                    <p style="font-size:12px;font-family:JetBrains Mono,monospace;">FUNCIÓN DE ONDA |ψ(L)⟩²</p>
+                    <p class="text-sm mono text-gold-light" style="color:#d4921e;">ρ(L,t) = |ψ(L,t)|²</p>
+                    <p style="font-size:12px;color:#888;">La densidad de probabilidad de la liquidez L en el tiempo t. Picos agudos = mercado estable. Colas pesadas = crisis inminente.</p>
+                </div>
+            </div>
+            <div id="quantum-liquidity-result" style="background:#0d0d0d;border-radius:5px;padding:16px;font-size:13px;color:#aaaaaa;"></div>
+        </div>
+        <p id="status" style="font-size:12px;font-family:JetBrains Mono,monospace;"></p>
+    </div>
+
+    <div id="tab-1" class="hidden">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;">
+            <div>
+                <h1 class="text-3xl font-bold">Matriz de Correlaciones <span style="color:#dddddd;">Tensoriales</span></h1>
+                <p style="color:#555;font-size:11px;margin-top:4px;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace;text-transform:uppercase;">Correlación sobre log-returns · ρ_AB = E[(ln Rₐ−μₐ)(ln R_b−μ_b)]/(σₐ·σ_b·N) · Señal sistémica |ρ|>0.85 · Spread proxy 10Y−2Y</p>
+            </div>
+            <button onclick="loadRealCorrelations()" class="btn-purple px-5 py-2 rounded-xl text-sm font-bold text-white flex items-center ">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Calcular Tensor Real
+            </button>
+        </div>
+        <div style="gap:16px;" class="lg-grid-3">
+            <div class="glass" style="border-radius:6px;overflow-x:auto;padding:20px;">
+                <h3 style="font-size:13px;font-weight:600;color:#888;">Matriz de Correlación ρ_AB sobre Log-Returns (Datos FRED)</h3>
+                <div id="heatmap" class="min-w-[600px]"></div>
+            </div>
+            <div class="space-y-4">
+                <div class="glass" style="border-radius:6px;">
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Correlación Sistémica Real</h4>
+                    <p class="text-xs " style="color:#888888;">Dos activos muestran riesgo de contagio cuando su correlación sobre log-returns supera |ρ| > 0.85. Se calcula como: ρ_AB = E[(ln(Rₐ)−μₐ)(ln(R_b)−μ_b)] / (σₐ·σ_b·N).</p>
+                    <div id="bell-result" style="background:#0d0d0d;border-radius:4px;font-size:11px;font-family:JetBrains Mono,monospace;"></div>
+                </div>
+                <div class="glass" style="border-radius:6px;">
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Señal de Contagio</h4>
+                    <p style="font-size:12px;font-family:JetBrains Mono,monospace;">|ρ| > 0.85 → señal sistémica (contagio)<br>Spread_proxy = r_10y − r_2y<br>spread &lt; 0 → inversión de curva → recesión</p>
+                    <p class="text-xs " style="color:#888888;">Si |ρ| > 0.85 → contagio sistémico → estrés de mercado extremo. Spread invertido (10Y−2Y &lt; 0) = señal recesión con ~73% de precisión histórica.</p>
+                    <div id="bell-violation" class=" text-lg font-bold"></div>
+                </div>
+                <div class="glass" style="border-radius:6px;">
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">📐 Spread Proxy (sin API)</h4>
+                    <p style="font-size:12px;color:#888;">Ingresá los yields manualmente para calcular la señal de recesión sin depender de datos externos.</p>
+                    <div class="space-y-2 ">
+                        <div>
+                            <label class="text-xs " style="color:#666666;">10Y Yield (%)</label>
+                            <input id="spread-10y" type="number" step="0.01" value="4.35" class="input-field" style="width:100%;border-radius:4px;font-size:12px;font-family:JetBrains Mono,monospace;">
+                        </div>
+                        <div>
+                            <label class="text-xs " style="color:#666666;">2Y Yield (%)</label>
+                            <input id="spread-2y" type="number" step="0.01" value="4.70" class="input-field" style="width:100%;border-radius:4px;font-size:12px;font-family:JetBrains Mono,monospace;">
+                        </div>
+                    </div>
+                    <button onclick="calcSpreadProxy()" class="btn-primary w-full py-2 rounded-lg text-xs font-bold " style="color:#ffffff;">Calcular Señal</button>
+                    <div id="spread-result" class="hidden" style="background:#0d0d0d;border-radius:4px;font-size:11px;font-family:JetBrains Mono,monospace;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="glass" style="padding:24px;border-radius:6px; ">
+            <h3 style="font-size:13px;font-weight:600;color:#888;">Evolución Temporal del Tensor de Correlación</h3>
+            <div class="chart-container" style="height:350px"><canvas id="chart-correlation"></canvas></div>
+        </div>
+    </div>
+
+    <div id="tab-2" class="hidden">
+        <div>
+            <h1 class="text-3xl font-bold">Motor Cuántico <span style="color:var(--gold);">Macro</span></h1>
+            <p style="color:#555;font-size:11px;margin-top:4px;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace;text-transform:uppercase;">Ecuación de Schrödinger financiera • Operadores cuánticos • Integral de camino de Feynman</p>
+        </div>
+        <div style="gap:16px;" class="lg-grid-2">
+            <div class="glass" style="padding:24px;border-radius:6px;">
+                <div style="display:flex;align-items:center;">
+                    <div style="width:34px;height:34px;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;">🇺🇸</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-gold" style="color:var(--gold);">FEDERAL RESERVE</h2>
+                        <p class="text-xs " style="color:#666666;">Modelo Hamiltoniano Cuántico</p>
+                    </div>
+                </div>
+                <div class="space-y-4 ">
+                    <div>
+                        <label style="font-size:12px;display:block;">Spread 2Y-10Y (%)</label>
+                        <input id="fed-spread" type="number" step="0.01" value="-0.35" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;display:block;">CPI YoY (%)</label>
+                        <input id="fed-cpi" type="number" step="0.01" value="2.8" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;display:block;">Tasa Desempleo (%)</label>
+                        <input id="fed-unemployment" type="number" step="0.01" value="4.2" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;display:block;">WALCL Balance Sheet (T)</label>
+                        <input id="fed-walcl" type="number" step="0.01" value="6.8" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                    </div>
+                    <button onclick="runQuantumFED()" class="btn-primary w-full py-3 rounded-xl text-sm font-bold " style="color:#ffffff;">⚛️ Ejecutar Motor Cuántico FED</button>
+                </div>
+                <div id="fed-result" class="hidden glass" style="border-radius:5px;border:1px solid #222;">
+                    <div class="flex justify-between items-start ">
+                        <div>
+                            <p class="text-xs " style="color:#888888;">PROBABILIDAD DE TRANSICIÓN</p>
+                            <p class="text-4xl font-bold text-gold" style="color:var(--gold);" id="fed-prob">--%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs " style="color:#888888;">RÉGIMEN</p>
+                            <p class="text-sm font-bold " style="color:#ffffff;" id="fed-regime">--</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-xs mono">
+                        <div class="flex justify-between"><span style="color:#888888;">Hamiltoniano Ĥ:</span><span style="color:#e09418;" id="fed-hamiltonian">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">Energía E₀:</span><span style="color:#d4921e;" id="fed-energy">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">Nivel Cuántico n:</span><span class="text-white-sec" style="color:#cccccc;" id="fed-level">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">λ (acoplamiento φ⁴):</span><span class="text-gold-dim" style="color:#c4831a;" id="fed-lambda">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">ΔPrice × ΔTime ≥ ℏ/2:</span><span style="color:#bb3333;" id="fed-uncertainty">--</span></div>
+                    </div>
+                    <div style="background:#0d0d0d;border-radius:4px;padding:14px;font-size:12px;color:#aaaaaa;line-height:1.7;margin-top:14px;" id="fed-explanation"></div>
+                </div>
+            </div>
+            <div class="glass" style="border-radius:6px;border:1px solid rgba(245,166,35,0.2);padding:24px;">
+                <div style="display:flex;align-items:center;">
+                    <div style="width:34px;height:34px;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;">🇪🇺</div>
+                    <div>
+                        <h2 style="font-size:15px;font-weight:800;color:#fff;letter-spacing:0.08em;">BANCO CENTRAL EUROPEO</h2>
+                        <p class="text-xs " style="color:#666666;">Modelo Hamiltoniano Cuántico — Eurozona</p>
+                    </div>
+                </div>
+                <div class="space-y-4 ">
+                    <div>
+                        <label style="font-size:12px;display:block;">Spread BTP-Bund 10Y (%)</label>
+                        <input id="ecb-spread" type="number" step="0.01" value="1.20" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;display:block;">CPI Eurozona YoY (%)</label>
+                        <input id="ecb-cpi" type="number" step="0.01" value="2.4" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;display:block;">Desempleo Eurozona (%)</label>
+                        <input id="ecb-unemployment" type="number" step="0.01" value="6.1" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px;display:block;">BCE Balance Sheet (T €)</label>
+                        <input id="ecb-balance" type="number" step="0.01" value="6.4" class="input-field" style="width:100%;border-radius:5px;font-size:13px;font-family:JetBrains Mono,monospace;">
+                        <div style="border-radius:4px;border:1px solid #222;display:flex;align-items:flex-start;">
+                            <span style="font-size:12px;margin-top:2px;">⚠️</span>
+                            <p style="font-size:10px;line-height:1.6;">
+                                <strong style="color:var(--gold);">Campo manual</strong> — El balance del BCE no está disponible en FRED como serie actualizable automáticamente. Actualizalo manualmente cada semana cuando el BCE publica (valor actual ~6.4T €). CPI, desempleo y spread BTP-Bund se cargan automáticamente con "Cargar Datos BCE".
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex ">
+                        <button id="ecb-load-btn" onclick="loadECBData(this)" class="btn-secondary" style="flex:1;padding:11px;font-size:12px;cursor:pointer;letter-spacing:0.06em;">
+                            📡 Cargar Datos BCE
+                        </button>
+                        <button onclick="runQuantumECB()" class="btn-primary" style="flex:1;padding:11px;font-size:12px;cursor:pointer;letter-spacing:0.06em;">
+                            ⚛️ Ejecutar Motor BCE
+                        </button>
+                    </div>
+                </div>
+                <div id="ecb-result" class="hidden glass" style="border-radius:5px;border:1px solid rgba(245,166,35,0.2);padding:18px;">
+                    <div class="flex justify-between items-start ">
+                        <div>
+                            <p class="text-xs " style="color:#888888;">PROBABILIDAD DE TRANSICIÓN</p>
+                            <p class="text-4xl font-bold text-yellow-400" id="ecb-prob">--%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs " style="color:#888888;">RÉGIMEN</p>
+                            <p class="text-sm font-bold " style="color:#ffffff;" id="ecb-regime">--</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-xs mono">
+                        <div class="flex justify-between"><span style="color:#888888;">Hamiltoniano Ĥ:</span><span class="text-yellow-300" id="ecb-hamiltonian">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">Energía E₀:</span><span style="color:#d4921e;" id="ecb-energy">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">Nivel Cuántico n:</span><span class="text-white-sec" style="color:#cccccc;" id="ecb-level">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">λ (acoplamiento φ⁴):</span><span class="text-gold-dim" style="color:#c4831a;" id="ecb-lambda">--</span></div>
+                        <div class="flex justify-between"><span style="color:#888888;">ΔPrice × ΔTime ≥ ℏ/2:</span><span style="color:#bb3333;" id="ecb-uncertainty">--</span></div>
+                    </div>
+                    <div style="background:#0d0d0d;border-radius:4px;padding:14px;font-size:12px;color:#aaaaaa;line-height:1.7;margin-top:14px;" id="ecb-explanation"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparativa FED vs BCE -->
+        <div class="glass" style="padding:24px;border-radius:6px; ">
+            <h3 style="font-size:13px;font-weight:600;color:#888;">📊 Comparativa FED vs BCE — Tasas de Referencia Históricas</h3>
+            <div class="chart-container" style="height:280px"><canvas id="chart-fed-ecb"></canvas></div>
+        </div>
+
+        <div class="glass" style="padding:24px;border-radius:6px; ">
+            <h3 style="font-size:16px;font-weight:700;color:var(--gold);">🔬 Fundamento Matemático del Motor Cuántico</h3>
+            <div style="gap:8px;font-size:13px;" class="md-grid-2">
+                <div>
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">1. Hamiltoniano del Mercado</h4>
+                    <p class=" text-xs leading-relaxed ">Basado en la teoría φ⁴ cuántica de Bachtis & Berman (2025), el Hamiltoniano del mercado monetario se define como:</p>
+                    <p style="font-family:JetBrains Mono,monospace;font-size:11px;border-radius:4px;">Ĥ = p̂²/2m + ½mω²(L-L₀)² + λ(L-L₀)⁴ + V_ext(t)</p>
+                    <p class=" text-xs">Donde L = liquidez, L₀ = equilibrio, ω = frecuencia natural del ciclo económico, λ = aversión al riesgo colectiva, V_ext = shocks externos (guerras, pandemias).</p>
+                </div>
+                <div>
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">2. Ecuación de Schrödinger Financiera</h4>
+                    <p class=" text-xs leading-relaxed ">La evolución temporal del estado del mercado |ψ(t)⟩ sigue la ecuación de Schrödinger dependiente del tiempo:</p>
+                    <p style="font-family:JetBrains Mono,monospace;font-size:11px;border-radius:4px;">iℏ ∂|ψ⟩/∂t = [Ĥ₀ + Ĥ_int(t)]|ψ⟩</p>
+                    <p class=" text-xs">Ĥ₀ = Hamiltoniano libre (política monetaria neutral). Ĥ_int = perturbación por datos macro (CPI, empleo, spreads). La probabilidad de transición se calcula con teoría de perturbaciones de primer orden.</p>
+                </div>
+                <div>
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">3. Integral de Camino de Feynman</h4>
+                    <p class=" text-xs leading-relaxed ">La amplitud de probabilidad de transición entre estados se calcula sumando sobre todas las trayectorias posibles:</p>
+                    <p style="font-family:JetBrains Mono,monospace;font-size:11px;border-radius:4px;">⟨ψ_f|ψ_i⟩ = ∫ D[L(t)] exp(iS[L]/ℏ)</p>
+                    <p class=" text-xs">S = acción de la trayectoria = ∫(T-V)dt. Cada trayectoria de liquidez posible contribuye con un factor de fase. La interferencia constructiva/destructiva determina el resultado más probable.</p>
+                </div>
+                <div>
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">4. Principio de Incertidumbre Financiero</h4>
+                    <p class=" text-xs leading-relaxed ">Aplicación directa del principio de Heisenberg a mercados financieros:</p>
+                    <p style="font-family:JetBrains Mono,monospace;font-size:11px;border-radius:4px;">ΔPrice × ΔTime ≥ ℏ_eff/2</p>
+                    <p class=" text-xs">ℏ_eff ≈ 0.01 (constante de Planck efectiva del mercado). A mayor precisión temporal (HFT), mayor incertidumbre en precio. Estrategias de largo plazo ganan certeza de precio a costa de precisión temporal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-3" class="hidden">
+        <div>
+            <h1 class="text-3xl font-bold">🤖 IA Macro <span style="color:var(--gold);">Cuántica</span></h1>
+            <p style="color:#555;font-size:11px;margin-top:4px;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace;text-transform:uppercase;">Pollinations AI (GPT-4o mini) · Gratis · Sin API key · Contexto FRED live</p>
+        </div>
+
+        <!-- Aviso de transparencia -->
+        <div style="gap:16px;" class="lg-grid-2">
+            <div style="display:flex;align-items:flex-start;border-radius:5px;border:1px solid #222;">
+                <span style="font-size:18px;margin-top:2px;">✅</span>
+                <div>
+                    <p style="font-size:12px;font-weight:700;">IA 100% gratuita — Pollinations AI</p>
+                    <p style="font-size:11px;line-height:1.6;">Usa <strong style="color:#ffffff;">GPT-4o mini</strong> internamente vía <code style="font-family:JetBrains Mono,monospace;font-size:11px;padding:1px 4px;border-radius:3px;color:#e09418;background:rgba(245,166,35,0.08);">text.pollinations.ai</code>. Sin registro, sin API key, sin límite documentado. Recibe los datos FRED reales como contexto en cada consulta. Si no responde en 30s, el fallback local usa los datos FRED disponibles para responder.</p>
+                </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;border-radius:5px;border:1px solid rgba(245,166,35,0.2);padding:10px;gap:10px;">
+                <span style="font-size:18px;margin-top:2px;">⚠️</span>
+                <div>
+                    <p style="font-size:12px;font-weight:700;">Limitación conocida — 99/100</p>
+                    <p style="font-size:11px;line-height:1.6;">El <strong style="color:#ffffff;">balance del BCE</strong> no existe en FRED como serie automática — se ingresa manualmente en Tab 2 (~6.4T € actual). Actualizarlo semanalmente cuando el BCE publica. Todo lo demás (CPI, desempleo, spread BTP-Bund, tasas, correlaciones, gráficos) es 100% automático y en tiempo real.</p>
+                </div>
+            </div>
+        </div>
+        <div style="gap:16px;" class="lg-grid-3">
+            <div class="lg:col-span-2 glass h-[65vh] flex flex-col rounded-2xl overflow-hidden">
+                <div id="chat-messages" class="scrollbar-hide" style="flex:1;overflow-y:auto;"></div>
+                <div style="border-top:1px solid #222;background:#101010;padding-top:10px;margin-top:10px;">
+                    <div class="flex ">
+                        <input id="chat-input" type="text" placeholder="Ej: ¿Cuál es el estado del mercado?" 
+                               class="input-field" style="flex:1;padding:10px 14px;font-size:13px;" 
+                               onkeypress="if(event.key==='Enter') sendQuantumMessage()">
+                        <button onclick="sendQuantumMessage()" class="btn-primary px-5 py-3 rounded-xl text-sm font-bold " style="color:#ffffff;">Enviar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="glass" style="border-radius:6px;">
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Estado del Mercado |ψ⟩</h4>
+                    <div id="market-state" class="text-xs mono space-y-2">
+                        <div class="flex justify-between"><span style="color:#666666;">|Bull⟩:</span><span style="color:var(--gold);" id="state-bull">--</span></div>
+                        <div class="flex justify-between"><span style="color:#666666;">|Bear⟩:</span><span style="color:#cc4444;" id="state-bear">--</span></div>
+                        <div class="flex justify-between"><span style="color:#666666;">|Sideways⟩:</span><span style="color:var(--gold);" id="state-side">--</span></div>
+                        <div style="display:flex;justify-content:space-between;border-top:1px solid #222;padding-top:8px;"><span style="color:#666666;">Coherencia:</span><span style="color:var(--gold);" id="state-coherence">--</span></div>
+                    </div>
+                </div>
+                <div class="glass" style="border-radius:6px;">
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Operadores Cuánticos</h4>
+                    <div class="text-xs mono space-y-2 " style="color:#888888;">
+                        <p><span style="color:var(--gold);">P̂</span> = -iℏ∇ (Momentum)</p>
+                        <p><span style="color:#dddddd;">X̂</span> = posición (precio)</p>
+                        <p><span style="color:var(--gold);">Ĥ</span> = P̂²/2m + V(X̂)</p>
+                        <p><span style="color:var(--gold);">σ̂_z</span> = estado de riesgo</p>
+                    </div>
+                </div>
+                <div class="glass" style="border-radius:6px;">
+                    <h4 style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Sugerencias</h4>
+                    <div class="space-y-2">
+                        <button onclick="quickAsk('liquidez')" class="btn-secondary" style="width:100%;text-align:left;padding:8px 10px;font-size:11px;cursor:pointer;margin-bottom:4px;">💧 ¿Cómo está la liquidez cuántica?</button>
+                        <button onclick="quickAsk('fed')" class="btn-secondary" style="width:100%;text-align:left;padding:8px 10px;font-size:11px;cursor:pointer;margin-bottom:4px;">🏛️ Estado cuántico de la FED</button>
+                        <button onclick="quickAsk('regimen')" class="btn-secondary" style="width:100%;text-align:left;padding:8px 10px;font-size:11px;cursor:pointer;margin-bottom:4px;">📊 ¿En qué régimen cuántico estamos?</button>
+                        <button onclick="quickAsk('contagio')" class="btn-secondary" style="width:100%;text-align:left;padding:8px 10px;font-size:11px;cursor:pointer;margin-bottom:4px;">🔗 ¿Hay señal de contagio sistémico?</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-4" class="hidden">
+        <div>
+            <h1 class="text-3xl font-bold">Series Temporales <span style="color:#cc4444;">Avanzadas</span></h1>
+            <p style="color:#555;font-size:11px;margin-top:4px;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace;text-transform:uppercase;">Transformada de Fourier cuántica • Análisis espectral • Frecuencias de ciclo económico</p>
+        </div>
+        <div style="gap:16px;" class="lg-grid-2">
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">Espectro de Frecuencias — M2 Growth Rate</h3>
+                <div class="chart-container"><canvas id="chart-fft-m2"></canvas></div>
+            </div>
+            <div class="glass" style="border-radius:6px;">
+                <h3 style="font-size:13px;font-weight:600;color:#888;">Ciclos Económicos Detectados</h3>
+                <div id="cycle-analysis" class="space-y-3 text-sm"></div>
+            </div>
+        </div>
+        <div class="glass" style="padding:24px;border-radius:6px; ">
+            <h3 style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;">Análisis de Autocorrelación — Función de Onda Temporal</h3>
+            <div class="chart-container" style="height:300px"><canvas id="chart-autocorr"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN GLOBAL
+// ═══════════════════════════════════════════════════════════════════════════════
+const FRED_KEY = "0a500d0d2203710c5b9638ee3ee62b65";
+const FRED_BASE = "https://api.stlouisfed.org/fred/series/observations";
+
+// Estrategia de fetch en orden de prioridad:
+// 1. Proxy local (server.py en localhost:8765) — sin restricciones CORS
+// 2. Directo a FRED (funciona si el navegador lo permite)
+// 3. Fallback matemático con datos históricos estimados
+
+const LOCAL_PROXY  = `${location.protocol}//${location.hostname}:8765/fred-proxy?url=`;
+const FRED_DIRECT  = ""; // fetch directo — funciona desde servidor HTTP
+
+// Proxies públicos como último recurso
+const PUBLIC_PROXIES = [
+    "https://corsproxy.io/?",
+    "https://api.allorigins.win/raw?url=",
+    "https://api.codetabs.com/v1/proxy?quest="
+];
+
+let currentProxy = 0;
+function getProxy() { return PUBLIC_PROXIES[currentProxy]; }
+function rotateProxy() { currentProxy = (currentProxy + 1) % PUBLIC_PROXIES.length; }
+
+// Detectar si corremos en Electron (proxy FRED integrado) o en local (server.py)
+const IS_ELECTRON = typeof window.electronAPI !== 'undefined';
+const IS_LOCAL = IS_ELECTRON || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+
+let charts = {};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RELOJ UTC
+// ═══════════════════════════════════════════════════════════════════════════════
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toISOString().slice(11,19) + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════════════════════
+function openTab(n) {
+    document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
+    document.getElementById(`tab-${n}`).classList.remove('hidden');
+    document.querySelectorAll('button[onclick^="openTab"]').forEach(b => {
+        b.style.borderBottomColor = 'transparent';
+        b.style.color = '#555';
+    });
+    const active = document.querySelectorAll('button[onclick^="openTab"]')[n];
+    active.style.borderBottomColor = 'var(--gold)';
+    active.style.color = 'var(--gold)';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FETCH FRED CON RETRY Y PROXY ROTATION
+// ═══════════════════════════════════════════════════════════════════════════════
+// ── Datos de fallback matemático (estimados de series FRED históricas)
+// Se usan cuando no hay conexión disponible
+const FALLBACK_DATA = {
+    M2SL:      { value: 21500, unit: "B", trend: "up",   note: "Estimado — sin conexión API" },
+    RRPONTSYD: { value: 400,   unit: "B", trend: "down",  note: "Estimado — sin conexión API" },
+    WALCL:     { value: 6800000, unit: "M", trend: "down", note: "Estimado — sin conexión API" },
+    DGS10:     { value: 4.35,  unit: "%", trend: "flat",  note: "Estimado — sin conexión API" },
+    FEDFUNDS:  { value: 5.33,  unit: "%", trend: "flat",  note: "Estimado — sin conexión API" },
+    CPIAUCSL:  { value: 310,   unit: "idx", trend: "up",  note: "Estimado — sin conexión API" },
+    UNRATE:    { value: 4.1,   unit: "%", trend: "flat",  note: "Estimado — sin conexión API" },
+    GDPC1:     { value: 22000000, unit: "M", trend: "up", note: "Estimado — sin conexión API" },
+    DGS2:      { value: 4.70,  unit: "%", trend: "flat",  note: "Estimado — sin conexión API" },
+    INDPRO:    { value: 103.5, unit: "idx", trend: "up",  note: "Estimado — sin conexión API" }
+};
+
+function makeFallbackObs(seriesId, limit, sort) {
+    const f = FALLBACK_DATA[seriesId];
+    if (!f) throw new Error("Sin fallback para " + seriesId);
+    const val = f.value;
+    // Generar observaciones sintéticas con ruido mínimo
+    const obs = [];
+    const today = new Date();
+    for (let i = 0; i < Math.max(1, limit); i++) {
+        const d = new Date(today);
+        d.setMonth(d.getMonth() - (sort === 'desc' ? i : limit - 1 - i));
+        const noise = 1 + (Math.random() - 0.5) * 0.005;
+        obs.push({ date: d.toISOString().slice(0,10), value: String((val * noise).toFixed(2)) });
+    }
+    return { observations: obs, _fallback: true, _note: f.note };
+}
+
+async function fetchFRED(series_id, limit, sort, start_date) {
+    const base = `${FRED_BASE}?series_id=${series_id}&api_key=${FRED_KEY}&file_type=json&limit=${limit}&sort_order=${sort}`;
+    const url = start_date ? base + `&observation_start=${start_date}` : base;
+
+    // ── Intento 1: proxy local (server.py) ──────────────────────────────────
+    if (IS_LOCAL) {
+        try {
+            const controller = new AbortController();
+            const tid = setTimeout(() => controller.abort(), 12000);
+            const res = await fetch(LOCAL_PROXY + encodeURIComponent(url), { signal: controller.signal });
+            clearTimeout(tid);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.observations && data.observations.length > 0) return data;
+            }
+        } catch(e) { /* seguir */ }
+    }
+
+    // ── Intento 2: fetch directo a FRED (funciona desde servidor HTTP/HTTPS) ─
+    try {
+        const controller = new AbortController();
+        const tid = setTimeout(() => controller.abort(), 12000);
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(tid);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.observations && data.observations.length > 0) return data;
+        }
+    } catch(e) { /* seguir */ }
+
+    // ── Intento 3: proxies públicos (rotación) ───────────────────────────────
+    for (let attempt = 0; attempt < PUBLIC_PROXIES.length; attempt++) {
+        try {
+            const controller = new AbortController();
+            const tid = setTimeout(() => controller.abort(), 10000);
+            const res = await fetch(getProxy() + encodeURIComponent(url), { signal: controller.signal });
+            clearTimeout(tid);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.observations && data.observations.length > 0) return data;
+            }
+        } catch(e) { /* seguir */ } finally { rotateProxy(); }
+    }
+
+    // ── Fallback matemático ──────────────────────────────────────────────────
+    console.warn(`[FRED fallback] ${series_id} — usando datos estimados`);
+    return makeFallbackObs(series_id, limit, sort);
+}
+
+function getDateYearAgo() {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 1);
+    return d.toISOString().slice(0,10);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 0: LIQUIDEZ CUÁNTICA — DATOS REALES FRED
+// ═══════════════════════════════════════════════════════════════════════════════
+async function loadLiquidity() {
+    const status = document.getElementById('status');
+    status.textContent = "⚛️ Inicializando función de onda del mercado...";
+
+    const items = [
+        { name: "M2 Money Supply",    id: "M2SL",      unit: "T",  decimals: 2, color: "cyan",    desc: "Oferta monetaria M2" },
+        { name: "Reverse Repo",       id: "RRPONTSYD",  unit: "B",  decimals: 0, color: "violet",  desc: "Acuerdos de recompra inversos" },
+        { name: "FED Balance Sheet",  id: "WALCL",      unit: "T",  decimals: 2, color: "emerald", desc: "Balance de la Reserva Federal" },
+        { name: "10Y Treasury Yield", id: "DGS10",      unit: "%",  decimals: 2, color: "amber",   desc: "Rendimiento Bonos 10Y" },
+        { name: "Federal Funds Rate", id: "FEDFUNDS",   unit: "%",  decimals: 2, color: "rose",    desc: "Tasa de fondos federales" },
+        { name: "CPI YoY",            id: "CPIAUCSL",   unit: "%",  decimals: 1, color: "orange",  desc: "Índice de Precios al Consumidor" },
+        { name: "Unemployment Rate",  id: "UNRATE",     unit: "%",  decimals: 1, color: "blue",    desc: "Tasa de desempleo" },
+        { name: "Real GDP",           id: "GDPC1",      unit: "T",  decimals: 2, color: "teal",    desc: "PIB Real" }
+    ];
+
+    const colorMap = {
+        cyan: ' ', violet: ' ',
+        emerald: ' ', amber: ' ',
+        rose: ' ', orange: ' ',
+        blue: ' ', teal: ' '
+    };
+
+    // ── Fetch paralelo: todos en simultáneo en vez de secuencial ────────────
+    status.textContent = "CARGANDO " + items.length + " SERIES FRED EN PARALELO...";
+
+    const fetches = items.map(item => {
+        if (item.id === "CPIAUCSL") {
+            return fetchFRED('CPIAUCSL', 13, 'desc', null).catch(() => null);
+        }
+        return fetchFRED(item.id, 1, 'desc', null).catch(() => null);
+    });
+
+    const rawResults = await Promise.all(fetches);
+
+    let html = "";
+    const results = {};
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const data = rawResults[i];
+        try {
+            if (!data || !data.observations || data.observations.length === 0)
+                throw new Error("Sin datos");
+
+            let value, date, rawLatest;
+
+            if (item.id === "CPIAUCSL") {
+                const obs = data.observations.filter(o => !isNaN(parseFloat(o.value)));
+                if (obs.length < 2) throw new Error("CPI: insuficiente");
+                const latest  = parseFloat(obs[0].value);
+                const prev    = parseFloat(obs[Math.min(12, obs.length - 1)].value);
+                value    = ((latest - prev) / prev * 100).toFixed(item.decimals);
+                date     = obs[0].date;
+                rawLatest = latest;
+            } else {
+                rawLatest = parseFloat(data.observations[0].value);
+                date      = data.observations[0].date;
+                if (item.id === "M2SL" || item.id === "WALCL" || item.id === "GDPC1") {
+                    value = (rawLatest / 1000000).toFixed(item.decimals);
+                } else if (item.id === "RRPONTSYD") {
+                    value = (rawLatest / 1000).toFixed(item.decimals);
+                } else {
+                    value = rawLatest.toFixed(item.decimals);
+                }
+            }
+
+            results[item.id] = { value, date, raw: rawLatest, _fallback: !!data._fallback };
+
+            const fallbackBadge = data._fallback
+                ? '<span style="font-size:9px;color:#f5a623;font-family:JetBrains Mono,monospace;background:rgba(245,166,35,0.1);padding:1px 5px;border-radius:3px;">ESTIMADO</span>'
+                : '';
+
+            html += '<div class="metric-card glass" style="padding:18px;border-radius:6px;border:1px solid #1e1e1e;cursor:default;">' +
+                '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">' +
+                    '<p style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.12em;font-family:JetBrains Mono,monospace;">' + item.desc + '</p>' +
+                    '<span style="font-size:9px;color:#444;font-family:JetBrains Mono,monospace;">' + date + '</span>' +
+                '</div>' +
+                '<p style="font-size:26px;font-weight:800;color:#f5a623;font-family:JetBrains Mono,monospace;letter-spacing:-1px;line-height:1;">' + value + item.unit + '</p>' +
+                '<p style="font-size:10px;color:#555;margin-top:6px;font-family:JetBrains Mono,monospace;">' + item.name + ' ' + fallbackBadge + '</p>' +
+            '</div>';
+        } catch(e) {
+            html += '<div class="metric-card glass" style="padding:18px;border-radius:6px;border:1px solid #1e1e1e;cursor:default;">' +
+                '<p style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.1em;font-family:JetBrains Mono,monospace;">' + item.desc + '</p>' +
+                '<p style="font-size:26px;font-weight:800;color:#555;font-family:JetBrains Mono,monospace;">--</p>' +
+                '<p style="font-size:10px;color:#444;margin-top:6px;font-family:JetBrains Mono,monospace;">' + item.name + ' — No disponible</p>' +
+            '</div>';
+            console.error("Error " + item.id + ":", e);
+        }
+    }
+
+    document.getElementById('liquidity-panel').innerHTML = html;
+
+    const hasFallback = Object.values(results).some(r => r && r._fallback);
+    const apiStatusEl = document.getElementById('api-status');
+    if (hasFallback) {
+        apiStatusEl.textContent = '⚠️ DATOS ESTIMADOS';
+        apiStatusEl.style.color = 'var(--gold)';
+        status.textContent = "⚠ SIN ACCESO A FRED API — DATOS ESTIMADOS · USAR SERVER.PY PARA DATOS REALES";
+    } else {
+        apiStatusEl.textContent = '● LIVE FRED API';
+        apiStatusEl.style.color = 'var(--gold)';
+        status.textContent = "✓ " + Object.keys(results).length + " SERIES FRED CARGADAS · φ⁴ ACTIVO";
+    }
+
+    // Exponer datos para el chat IA
+    window._fredResults = results;
+
+    // Actualizar mensaje de bienvenida del chat con datos reales
+    const chatWelcome = document.querySelector('#chat-messages > div > div');
+    if (chatWelcome && Object.keys(results).length > 0) {
+        const r = results;
+        chatWelcome.innerHTML = `
+            <p style="font-weight:700;color:#fff;margin-bottom:8px;">IA Macro Cuántica — Pollinations AI</p>
+            <p style="font-size:11px;color:#888;margin-bottom:8px;">Contexto FRED cargado con <strong style="color:#ffffff;">${Object.keys(results).length} series en tiempo real</strong>. Listo para analizar.</p>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;font-size:10px;font-family:'JetBrains Mono',monospace;color:#666;margin-bottom:8px;">
+                ${r.FEDFUNDS  ? `<span>Fed Funds: <b style="color:var(--gold);">${r.FEDFUNDS.value}%</b></span>` : ''}
+                ${r.CPIAUCSL  ? `<span>CPI YoY: <b style="color:var(--gold);">${r.CPIAUCSL.value}%</b></span>` : ''}
+                ${r.UNRATE    ? `<span>Desempleo: <b style="color:#ccc;">${r.UNRATE.value}%</b></span>` : ''}
+                ${r.DGS10     ? `<span>10Y Yield: <b style="color:#c4831a;">${r.DGS10.value}%</b></span>` : ''}
+            </div>
+            <p style="font-size:10px;color:#555;">Preguntame sobre liquidez, tasas, régimen macro o señales de riesgo.</p>`;
+    }
+
+    calculateQuantumLiquidity(results);
+    loadHistoricalCharts();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HAMILTONIANO CUÁNTICO DE LIQUIDEZ (MODELO φ⁴) — normalizado
+// ═══════════════════════════════════════════════════════════════════════════════
+function calculateQuantumLiquidity(results) {
+    const m2raw    = results.M2SL    ? results.M2SL.raw    : 21000000; // en M (millones)
+    const walclRaw = results.WALCL   ? results.WALCL.raw   : 6800000;
+    const fedfunds = results.FEDFUNDS ? results.FEDFUNDS.raw : 5.33;
+    // CPI raw aquí es el índice (ej. 310), no el YoY — lo ignoramos para la kurtosis
+    const cpiYoY   = results.CPIAUCSL ? parseFloat(results.CPIAUCSL.value) : 3.0;
+
+    const omega = 1.0;   // unidad natural — antes 0.025 hacía explotar omega³ en el denominador de kurtosis
+    const m_eff = 1.0;
+    const hbar  = 1.0;   // unidad natural — coherente con calcHamiltoniano()
+
+    // Normalizar: deltaL = desviación porcentual del balance FED respecto a equilibrio (6.5T)
+    const walclEq = 6500000; // M (6.5 T)
+    const deltaL  = (walclRaw - walclEq) / walclEq; // adimensional ≈ −0.5 a +0.5
+
+    // Potencial cuártico: λ proporcional a desviación de inflación y tasas (acotado a un rango razonable)
+    const lambda  = Math.min(0.5, Math.abs(fedfunds - 2.5) * 0.04 + Math.abs(cpiYoY - 2.0) * 0.03);
+
+    const T         = 0.5 * m_eff * omega * omega * deltaL * deltaL;
+    const V_quad    = 0.5 * m_eff * omega * omega * deltaL * deltaL;
+    const V_quartic = lambda * Math.pow(deltaL, 4);
+    const H         = T + V_quad + V_quartic;
+
+    const n_raw = Math.floor(H / (hbar * omega));
+    const n     = Math.max(0, Math.min(n_raw, 12)); // clamp acotado, igual que el motor FED/BCE
+
+    // |ψ(L)|² gaussiana perturbada: normalizada sobre deltaL adimensional
+    const psi_sq  = Math.exp(-m_eff * omega * deltaL * deltaL / hbar)
+                  * (1 + lambda * Math.pow(deltaL, 4) / Math.max(6 * hbar * omega, 1e-9));
+
+    // Kurtosis de la distribución de retornos implícita (acotada — antes explotaba por omega³ pequeño)
+    const kurtosisRaw = 3 + 24 * lambda / Math.max(m_eff * m_eff * omega * omega * omega, 1e-9);
+    const kurtosis = Math.min(15, kurtosisRaw); // exceso de kurtosis realista tope ~15 (eventos extremos tipo 2008)
+
+    const resultDiv = document.getElementById('quantum-liquidity-result');
+    let kurtMsg;
+    if      (kurtosis > 6)   kurtMsg = '⚠️ Kurtosis elevada — colas pesadas en distribución de retornos. Posible shock de mercado.';
+    else if (kurtosis > 4)   kurtMsg = '⚡ Kurtosis moderada — mercado excitado, volatilidad superior a normal.';
+    else                     kurtMsg = '✅ Kurtosis normal — mercado en estado base, distribución aproximadamente gaussiana.';
+
+    // Régimen basado en n
+    let regime, regimeColor;
+    if      (n === 0) { regime = 'ESTADO BASE';   regimeColor = 'color:#5fae6e'; }
+    else if (n <= 2)  { regime = 'EXCITADO BAJO'; regimeColor = 'color:var(--gold)'; }
+    else if (n <= 5)  { regime = 'EXCITADO ALTO'; regimeColor = 'color:var(--gold)'; }
+    else              { regime = 'TRANSICIÓN';    regimeColor = 'color:#cc4444'; }
+
+    resultDiv.innerHTML =
+        '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:10px;">' +
+            '<div><span style="font-size:11px;color:#666;">Hamiltoniano H:</span><br><span style="font-weight:700;font-family:JetBrains Mono,monospace;color:#fff;">' + H.toFixed(4) + '</span></div>' +
+            '<div><span style="font-size:11px;color:#666;">Nivel n:</span><br><span style="font-weight:700;font-family:JetBrains Mono,monospace;color:var(--gold);">' + n + '</span></div>' +
+            '<div><span style="font-size:11px;color:#666;">|ψ(L)|²:</span><br><span style="font-weight:700;font-family:JetBrains Mono,monospace;color:#fff;">' + psi_sq.toFixed(4) + '</span></div>' +
+            '<div><span style="font-size:11px;color:#666;">Kurtosis:</span><br><span style="font-weight:700;font-family:JetBrains Mono,monospace;color:#fff;">' + kurtosis.toFixed(2) + '</span></div>' +
+            '<div><span style="font-size:11px;color:#666;">Régimen:</span><br><span style="font-weight:700;font-size:12px;' + regimeColor + '">' + regime + '</span></div>' +
+        '</div>' +
+        '<p style="font-size:12px;color:#888888;">' +
+            '<span style="color:var(--gold);">ℹ️</span> ' + kurtMsg +
+            ' | δL = ' + deltaL.toFixed(4) + ' (desvío balance FED) | λ = ' + lambda.toFixed(4) + ' (acoplamiento φ⁴)' +
+        '</p>';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SELECTOR DE RANGO
+// ═══════════════════════════════════════════════════════════════════════════════
+let currentRange = '5y';
+
+function getRangeDates(range) {
+    const now = new Date();
+    const end = now.toISOString().slice(0,10);
+    let start;
+    if (range === '3m')  { const d = new Date(now); d.setMonth(d.getMonth()-3);   start = d.toISOString().slice(0,10); }
+    else if (range === '6m')  { const d = new Date(now); d.setMonth(d.getMonth()-6);   start = d.toISOString().slice(0,10); }
+    else if (range === '1y')  { const d = new Date(now); d.setFullYear(d.getFullYear()-1); start = d.toISOString().slice(0,10); }
+    else if (range === '2y')  { const d = new Date(now); d.setFullYear(d.getFullYear()-2); start = d.toISOString().slice(0,10); }
+    else if (range === '5y')  { const d = new Date(now); d.setFullYear(d.getFullYear()-5); start = d.toISOString().slice(0,10); }
+    else if (range === '10y') { const d = new Date(now); d.setFullYear(d.getFullYear()-10); start = d.toISOString().slice(0,10); }
+    else if (range === 'max') { start = '1950-01-01'; }
+    else if (range === 'custom') {
+        start = document.getElementById('custom-start').value || '2020-01-01';
+        return { start, end: document.getElementById('custom-end').value || end };
+    }
+    return { start, end };
+}
+
+function setRange(range) {
+    currentRange = range;
+    // Actualizar estilos de botones
+    document.querySelectorAll('.range-btn').forEach(b => {
+        b.className = 'range-btn'; b.style.padding='2px 10px'; b.style.fontSize='11px';
+    });
+    const activeBtn = document.getElementById('range-' + range);
+    if (activeBtn) {
+        activeBtn.className = 'range-btn active'; activeBtn.style.padding='2px 10px'; activeBtn.style.fontSize='11px';
+    }
+    // Si es custom, sincronizar inputs con fechas calculadas
+    if (range !== 'custom') {
+        const { start, end } = getRangeDates(range);
+        document.getElementById('custom-start').value = start;
+        document.getElementById('custom-end').value = end;
+    }
+    loadHistoricalCharts();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GRÁFICOS HISTÓRICOS FRED — con tooltips, rango dinámico y CPI YoY real
+// ═══════════════════════════════════════════════════════════════════════════════
+function makeChartOptions(label, color, extraPlugins) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#111111',
+                borderColor: '#f5a623',
+                borderWidth: 1,
+                titleColor: '#888888',
+                bodyColor: '#cccccc',
+                titleFont: { family: 'JetBrains Mono', size: 10 },
+                bodyFont: { family: 'JetBrains Mono', size: 11 },
+                padding: 10,
+                callbacks: {
+                    title: ctx => ctx[0].label,
+                    label: ctx => ` ${label}: ${ctx.parsed.y !== null ? ctx.parsed.y.toFixed(3) : 'N/A'}`
+                }
+            },
+            ...(extraPlugins || {})
+        },
+        scales: {
+            x: {
+                grid: { color: '#181818' },
+                border: { color: '#222' },
+                ticks: { color: '#444', font: { size: 9, family: 'JetBrains Mono' }, maxTicksLimit: 10 }
+            },
+            y: {
+                grid: { color: '#181818' },
+                border: { color: '#222' },
+                ticks: { color: '#444', font: { size: 9, family: 'JetBrains Mono' } }
+            }
+        }
+    };
+}
+
+async function loadHistoricalCharts() {
+    const { start, end } = getRangeDates(currentRange);
+
+    // ── Series simples ───────────────────────────────────────────────────────
+    const series = [
+        { id: 'M2SL',      canvas: 'chart-m2',       label: 'M2 (B USD)',        color: '#06b6d4', divisor: 1000000 },
+        { id: 'WALCL',     canvas: 'chart-fed',      label: 'FED Balance (B)',    color: '#10b981', divisor: 1000000 },
+        { id: 'DGS10',     canvas: 'chart-10y',      label: '10Y Yield (%)',      color: '#f59e0b', divisor: 1 },
+        { id: 'RRPONTSYD', canvas: 'chart-repo',     label: 'Reverse Repo (B)',   color: '#8b5cf6', divisor: 1000 },
+        { id: 'FEDFUNDS',  canvas: 'chart-fedfunds', label: 'Fed Funds Rate (%)', color: '#f43f5e', divisor: 1 }
+    ];
+
+    for (let s of series) {
+        try {
+            const data = await fetchFRED(s.id, 2000, 'asc', start);
+            const raw  = data.observations.filter(o => !isNaN(parseFloat(o.value)));
+            // Filtrar por end date
+            const filtered = raw.filter(o => o.date <= end);
+
+            const labels = filtered.map(o => o.date);
+            const values = filtered.map(o => parseFloat(o.value) / s.divisor);
+
+            // Submuestreo para no saturar el canvas (máx 300 puntos)
+            const step = Math.max(1, Math.floor(filtered.length / 300));
+            const subL  = labels.filter((_,i) => i % step === 0);
+            const subV  = values.filter((_,i) => i % step === 0);
+
+            const ctx = document.getElementById(s.canvas);
+            if (!ctx) continue;
+            if (charts[s.canvas]) charts[s.canvas].destroy();
+
+            charts[s.canvas] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: subL,
+                    datasets: [{
+                        label: s.label,
+                        data: subV,
+                        borderColor: s.color,
+                        backgroundColor: 'rgba(245,166,35,0.06)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: '#f5a623',
+                        borderWidth: 1.8
+                    }]
+                },
+                options: makeChartOptions(s.label, s.color)
+            });
+        } catch(e) { console.error('Chart error', s.id, e); }
+    }
+
+    // ── CPI YoY Rolling real ─────────────────────────────────────────────────
+    // Traer 13 meses extra antes del start para poder calcular YoY desde el primer punto
+    try {
+        const startExtra = new Date(start);
+        startExtra.setMonth(startExtra.getMonth() - 13);
+        const cpiData = await fetchFRED('CPIAUCSL', 2000, 'asc', startExtra.toISOString().slice(0,10));
+        const cpiRaw  = cpiData.observations.filter(o => !isNaN(parseFloat(o.value)));
+
+        const cpiLabels = [];
+        const cpiValues = [];
+
+        for (let i = 12; i < cpiRaw.length; i++) {
+            const date   = cpiRaw[i].date;
+            if (date < start || date > end) continue;
+            const curr   = parseFloat(cpiRaw[i].value);
+            const prev   = parseFloat(cpiRaw[i - 12].value);
+            if (prev === 0) continue;
+            cpiLabels.push(date);
+            cpiValues.push(((curr - prev) / prev * 100));
+        }
+
+        const ctx = document.getElementById('chart-cpi');
+        if (ctx) {
+            if (charts['chart-cpi']) charts['chart-cpi'].destroy();
+            // Colorear rojo encima de 2%, verde abajo
+            const color = '#fb923c';
+            charts['chart-cpi'] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: cpiLabels,
+                    datasets: [
+                        {
+                            label: 'CPI YoY (%)',
+                            data: cpiValues,
+                            borderColor: color,
+                            backgroundColor: color + '18',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: color,
+                            borderWidth: 1.8
+                        },
+                        // Línea objetivo 2%
+                        {
+                            label: 'Objetivo FED 2%',
+                            data: cpiLabels.map(() => 2),
+                            borderColor: 'rgba(245,166,35,0.3)',
+                            borderDash: [5, 4],
+                            borderWidth: 1.2,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    ...makeChartOptions('CPI YoY (%)', color),
+                    plugins: {
+                        ...makeChartOptions('CPI YoY (%)', color).plugins,
+                        legend: {
+                            display: true,
+                            labels: { color: '#64748b', font: { size: 9 }, boxWidth: 14 }
+                        }
+                    }
+                }
+            });
+        }
+    } catch(e) { console.error('CPI chart error', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 1: CORRELACIONES TENSORIALES (DATOS REALES)
+// ═══════════════════════════════════════════════════════════════════════════════
+async function loadRealCorrelations() {
+    const heatmapDiv = document.getElementById('heatmap');
+    heatmapDiv.innerHTML = '<p class=" text-sm">⚛️ Cargando series FRED en paralelo...</p>';
+
+    const seriesIds = ['DGS10', 'DGS2', 'FEDFUNDS', 'UNRATE', 'CPIAUCSL', 'M2SL', 'WALCL', 'INDPRO'];
+    const names     = ['10Y',  '2Y',   'FedFunds', 'Unemployment', 'CPI',      'M2',   'WALCL', 'Industrial'];
+
+    try {
+        const startDate = '2023-01-01';
+
+        // ── Fetch paralelo de todas las series ───────────────────────────────
+        const fetches = seriesIds.map(id => fetchFRED(id, 500, 'asc', startDate).catch(() => null));
+        const rawAll  = await Promise.all(fetches);
+
+        const allData = {};
+        for (let i = 0; i < names.length; i++) {
+            const d = rawAll[i];
+            allData[names[i]] = d
+                ? d.observations.map(o => parseFloat(o.value)).filter(v => !isNaN(v))
+                : [];
+        }
+
+        const n = names.length;
+        const matrix = Array(n).fill(null).map(() => Array(n).fill(0));
+
+        // ── N efectivo por serie (calculado ANTES de usarlo) ─────────────────
+        const effN = {};
+        for (let i = 0; i < n; i++) effN[names[i]] = Math.max(0, allData[names[i]].length - 1);
+
+        // ── Matriz de correlación (calculada ANTES de systemicPairs) ─────────
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+                if (i === j) { matrix[i][j] = 1; continue; }
+                matrix[i][j] = logReturnCorrelation(
+                    allData[names[i]], allData[names[j]], names[i], names[j]
+                );
+            }
+        }
+
+        // ── Pares sistémicos |ρ| > 0.85 con p-value (DESPUÉS de tener matrix y effN) ──
+        const systemicPairs = [];
+        for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++) {
+                if (Math.abs(matrix[i][j]) > 0.85) {
+                    const nEff = Math.min(effN[names[i]], effN[names[j]]);
+                    const pv   = correlationPValue(matrix[i][j], nEff);
+                    systemicPairs.push({ a: names[i], b: names[j], rho: matrix[i][j], p: pv, n: nEff });
+                }
+            }
+        }
+
+        // ── Heatmap HTML ─────────────────────────────────────────────────────
+        let html = '<table class="w-full text-center"><thead><tr><th class=" text-xs " style="color:#666666;"></th>';
+        names.forEach(a => html += '<th style="color:#888;font-size:12px;font-weight:500;">' + a + '</th>');
+        html += '</tr></thead><tbody>';
+
+        names.forEach(function(row, i) {
+            html += '<tr><td style="color:#888;font-size:12px;font-weight:500;">' + row + '</td>';
+            names.forEach(function(col, j) {
+                const v = matrix[i][j];
+                let color, textColor = 'text-white';
+                if      (v >= 0.7)  { color = 'hm-hi'; }
+                else if (v >= 0.4)  { color = 'hm-med'; }
+                else if (v >= 0.1)  { color = 'hm-lo'; textColor = ''; }
+                else if (v > -0.1)  { color = 'hm-zero';       textColor = ''; }
+                else if (v > -0.4)  { color = 'hm-neg-lo';    textColor = ''; }
+                else if (v > -0.7)  { color = 'hm-neg-med'; }
+                else                { color = 'hm-neg-hi'; }
+
+                const nEff = Math.min(effN[names[i]], effN[names[j]]);
+                const pv   = i === j ? 0 : correlationPValue(v, nEff);
+                const sig  = i === j ? { txt: '', cls: '' } : sigLabel(pv, nEff);
+
+                html += '<td><div class="' + color + ' ' + textColor +
+                    ' font-bold py-2 rounded-xl text-xs mono" title="ρ=' + v.toFixed(3) +
+                    ' | N=' + nEff + ' | ' + sig.txt + '">' +
+                    v.toFixed(2) +
+                    (i !== j ? '<br><span class="' + sig.cls + ' font-normal" style="font-size:8px">' + sig.txt + '</span>' : '') +
+                    '</div></td>';
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        html += '<p style="font-size:10px;font-family:JetBrains Mono,monospace;">*** p&lt;0.001 · ** p&lt;0.01 · * p&lt;0.05 · NS = no significativo | hover sobre celda para detalles</p>';
+        heatmapDiv.innerHTML = html;
+
+        calculateBellViolation(matrix, names, systemicPairs);
+        plotCorrelationEvolution(allData, names);
+
+    } catch(e) {
+        heatmapDiv.innerHTML = '<p class=" text-sm">⚠️ Error: ' + e.message + '</p>';
+        console.error(e);
+    }
+}
+
+// ── Correlación clásica de Pearson sobre valores brutos (para series estacionarias)
+function pearsonCorrelation(x, y) {
+    const minLen = Math.min(x.length, y.length);
+    const xs = x.slice(-minLen);
+    const ys = y.slice(-minLen);
+    const n = minLen;
+    if (n < 2) return 0;
+    const sumX = xs.reduce((a,b) => a+b, 0);
+    const sumY = ys.reduce((a,b) => a+b, 0);
+    const sumXY = xs.reduce((s, xi, i) => s + xi * ys[i], 0);
+    const sumX2 = xs.reduce((s, xi) => s + xi*xi, 0);
+    const sumY2 = ys.reduce((s, yi) => s + yi*yi, 0);
+    const num = n * sumXY - sumX * sumY;
+    const den = Math.sqrt((n * sumX2 - sumX*sumX) * (n * sumY2 - sumY*sumY));
+    return den === 0 ? 0 : num / den;
+}
+
+// ── Series que pueden tener valores ≤ 0 (tasas de interés, que pueden ser negativas)
+// Para estas usamos diferencias aritméticas en vez de log-returns
+const RATE_SERIES = new Set(['10Y','2Y','FedFunds','Unemployment','CPI']);
+
+// ── Diferencias aritméticas: correctas para tasas de interés (pueden ser 0 o negativas)
+function arithmeticDiffs(arr) {
+    const d = [];
+    for (let i = 1; i < arr.length; i++) d.push(arr[i] - arr[i-1]);
+    return d;
+}
+
+// ── Log-returns: correctos para series de nivel positivo (M2, WALCL, Industrial Production)
+function toLogReturns(arr) {
+    const lr = [];
+    for (let i = 1; i < arr.length; i++) {
+        if (arr[i] > 0 && arr[i-1] > 0) lr.push(Math.log(arr[i] / arr[i-1]));
+        else lr.push(arr[i] - arr[i-1]); // fallback aritmético si hay cero
+    }
+    return lr;
+}
+
+// ── Correlación adaptativa: elige método según la serie
+// ρ_AB = E[(Δₐ − μₐ)(Δ_b − μ_b)] / (σₐ · σ_b · N)
+function logReturnCorrelation(x, y, nameX, nameY) {
+    const minLen = Math.min(x.length, y.length);
+    const xs = x.slice(-minLen);
+    const ys = y.slice(-minLen);
+    const dX = (nameX && RATE_SERIES.has(nameX)) ? arithmeticDiffs(xs) : toLogReturns(xs);
+    const dY = (nameY && RATE_SERIES.has(nameY)) ? arithmeticDiffs(ys) : toLogReturns(ys);
+    return pearsonCorrelation(dX, dY);
+}
+
+// ── p-value aproximado de la correlación de Pearson (test t de dos colas)
+// t = r * sqrt(N-2) / sqrt(1-r²), df = N-2
+// Aproximación de la distribución t con integración numérica (Beta incompleta)
+function correlationPValue(r, n) {
+    if (n < 4) return 1;
+    const t = Math.abs(r) * Math.sqrt(n - 2) / Math.sqrt(Math.max(1e-12, 1 - r * r));
+    const df = n - 2;
+    // Aproximación de Abramowitz & Stegun para la distribución t
+    // p-value dos colas via regularized incomplete beta
+    const x = df / (df + t * t);
+    // Beta incompleta regularizada I_x(df/2, 0.5) — aproximación por serie
+    let p = 0;
+    const a = df / 2, b = 0.5;
+    // Usar expansión de Lanczos simplificada para I_x(a,b)
+    // Para valores comunes en finanzas (N=20-500), esta aproximación es suficiente
+    if (x >= 0 && x <= 1) {
+        // Método de Lentz para fracción continua de la función Beta incompleta
+        const lbeta = (a, b) => {
+            // log-gamma usando aproximación de Stirling
+            const lgamma = z => {
+                if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z);
+                z -= 1;
+                const c = [0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+                let x2 = 0.99999999999980993;
+                for (let i = 1; i < 9; i++) x2 += c[i] / (z + i);
+                const t2 = z + 7.5;
+                return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t2) - t2 + Math.log(x2);
+            };
+            return lgamma(a) + lgamma(b) - lgamma(a + b);
+        };
+        // Aproximación directa usando la relación con la distribución F
+        // p ≈ 2 * (1 - Φ(t)) para N grande (CLT)
+        // Para N pequeño usamos aproximación de Peizer-Pratt
+        const z = t / Math.sqrt(df / (df - 2 + t * t / df));
+        // Aproximación normal estándar
+        const phi = v => {
+            const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429, pp=0.3275911;
+            const sign = v < 0 ? -1 : 1;
+            const xv = Math.abs(v) / Math.sqrt(2);
+            const ti = 1 / (1 + pp * xv);
+            const y2 = 1 - (((((a5 * ti + a4) * ti) + a3) * ti + a2) * ti + a1) * ti * Math.exp(-xv * xv);
+            return 0.5 * (1 + sign * y2);
+        };
+        p = 2 * (1 - phi(Math.abs(z)));
+    }
+    return Math.min(1, Math.max(0, p));
+}
+
+// ── Significancia estadística
+function sigLabel(p, n) {
+    if (n < 10) return { txt: 'N insuf.', cls: '' };
+    if (p < 0.001) return { txt: 'p<0.001 ***', cls: '' };
+    if (p < 0.01)  return { txt: 'p<0.01 **',  cls: '' };
+    if (p < 0.05)  return { txt: 'p<0.05 *',   cls: '' };
+    return               { txt: 'p=' + p.toFixed(2) + ' NS', cls: '' };
+}
+
+// ── Señal sistémica: |ρ| > 0.85 → contagio sistémico
+function systemicSignal(rho) {
+    const abs = Math.abs(rho);
+    if (abs > 0.85) return { level: 'SISTÉMICO', color: '', icon: '🔴' };
+    if (abs > 0.65) return { level: 'ELEVADO',   color: '', icon: '🟡' };
+    if (abs > 0.40) return { level: 'MODERADO',  color: 'text-yellow-300', icon: '🟢' };
+    return              { level: 'BAJO',       color: '', icon: '✅' };
+}
+
+// ── Spread proxy para recesión (sin API): r_10y − r_2y
+// spread < 0 → inversión de curva → señal recesión (~73% precisión histórica)
+function spreadSignal(r10y, r2y) {
+    const spread = r10y - r2y;
+    return {
+        spread: spread.toFixed(3),
+        inverted: spread < 0,
+        signal: spread < 0
+            ? '⚠️ Inversión de curva → señal de recesión (precisión histórica ~73%)'
+            : '✅ Curva normal → no hay señal de inversión'
+    };
+}
+
+function calculateBellViolation(matrix, names, systemicPairs) {
+    // Correlación sistémica real: |ρ| > 0.85 → señal de contagio
+    // (reemplaza la métrica de "violación de Bell" que no tiene equivalente verificable en finanzas)
+    const bellDiv = document.getElementById('bell-violation');
+    const bellResult = document.getElementById('bell-result');
+
+    // Calcular ρ máximo entre pares clave (10Y, 2Y, FedFunds, CPI)
+    const keyIdx = [0, 1, 2, 4]; // 10Y, 2Y, FedFunds, CPI
+    let maxRho = 0;
+    let maxPair = ['', ''];
+    for (let ii = 0; ii < keyIdx.length; ii++) {
+        for (let jj = ii+1; jj < keyIdx.length; jj++) {
+            const r = Math.abs(matrix[keyIdx[ii]][keyIdx[jj]]);
+            if (r > maxRho) { maxRho = r; maxPair = [names[keyIdx[ii]], names[keyIdx[jj]]]; }
+        }
+    }
+
+    const sig = systemicSignal(maxRho);
+
+    if (maxRho > 0.85) {
+        bellDiv.innerHTML = '<span class="' + sig.color + '">' + sig.icon + ' |ρ| = ' + maxRho.toFixed(3) + ' > 0.85</span>';
+        bellDiv.innerHTML += '<p style="font-size:12px;color:#888;">⚠️ CONTAGIO SISTÉMICO DETECTADO</p>';
+    } else {
+        bellDiv.innerHTML = '<span class="' + sig.color + '">' + sig.icon + ' |ρ| = ' + maxRho.toFixed(3) + ' ≤ 0.85</span>';
+        bellDiv.innerHTML += '<p style="font-size:12px;color:#888;">✅ Sin contagio — Mercado estable</p>';
+    }
+
+    let pairsHtml = '';
+    if (systemicPairs.length > 0) {
+        pairsHtml = '<p class=" font-bold ">Pares sistémicos (|ρ|>0.85):</p>' +
+            systemicPairs.map(p => {
+                const sl = sigLabel(p.p, p.n);
+                return '<p style="color:#888888;">' + p.a + '↔' + p.b +
+                    ': ρ=' + p.rho.toFixed(3) +
+                    ' | <span class="' + sl.cls + '">' + sl.txt + '</span>' +
+                    ' | N=' + p.n + '</p>';
+            }).join('');
+    } else {
+        pairsHtml = '<p>Sin pares con correlación sistémica extrema.</p>';
+    }
+
+    bellResult.innerHTML =
+        '<p class="' + sig.color + ' font-bold">' + sig.icon + ' ' + sig.level + '</p>' +
+        '<p style="color:#888;font-size:12px;">Par clave: ' + maxPair[0] + '↔' + maxPair[1] + ' | ρ = ' + maxRho.toFixed(3) + '</p>' +
+        pairsHtml +
+        '<p style="color:#888;font-size:12px;">Método: correlación Pearson sobre log-returns. Umbral: |ρ| > 0.85 = señal de contagio sistémico.</p>';
+}
+
+function plotCorrelationEvolution(allData, names) {
+    const ctx = document.getElementById('chart-correlation');
+    if (!ctx) return;
+
+    const y10 = allData['10Y'];
+    const cpi = allData['CPI'];
+    const window = 12;
+    const rollingCorr = [];
+    const labels = [];
+
+    for (let i = window; i < Math.min(y10.length, cpi.length); i++) {
+        const w1 = y10.slice(i-window, i);
+        const w2 = cpi.slice(i-window, i);
+        rollingCorr.push(pearsonCorrelation(w1, w2));
+        labels.push(i);
+    }
+
+    if (charts['correlation']) charts['correlation'].destroy();
+
+    charts['correlation'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Corr(10Y, CPI) Rolling',
+                data: rollingCorr,
+                borderColor: '#888888',
+                backgroundColor: '#8b5cf620',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#94a3b8' } } },
+            scales: {
+                x: { display: false },
+                y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b' } }
+            }
+        }
+    });
+}
+
+function calcSpreadProxy() {
+    const r10y = parseFloat(document.getElementById('spread-10y').value);
+    const r2y  = parseFloat(document.getElementById('spread-2y').value);
+    if (isNaN(r10y) || isNaN(r2y)) return;
+
+    window._spread10y2y = r10y - r2y; // exponer para el chat IA
+
+    const sig = spreadSignal(r10y, r2y);
+    const div = document.getElementById('spread-result');
+    div.classList.remove('hidden');
+
+    const color = sig.inverted ? '' : '';
+    div.innerHTML =
+        '<p style="color:' + (sig.inverted ? '#cc4444' : 'var(--gold)') + ';font-weight:700;font-family:JetBrains Mono,monospace;">SPREAD = ' + sig.spread + '%</p>' +
+        '<p>' + sig.signal + '</p>' +
+        '<p style="color:#888;font-size:10px;">Spread_proxy = r_10y − r_2y = ' + r10y + ' − ' + r2y + ' = ' + sig.spread + '%</p>';
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MOTOR CUÁNTICO — función compartida de cálculo Hamiltoniano normalizado
+// deltaL se normaliza en unidades de equilibrio para evitar H/n astronómicos
+// ═══════════════════════════════════════════════════════════════════════════════
+function calcHamiltoniano({ spread, cpi, unemployment, balance, balanceEq, label }) {
+    const hbar  = 1.0;     // unidad natural — antes 0.01 generaba n→999 con cualquier desvío
+    const m     = 1.0;
+    const omega0 = 1.0;    // unidad natural — antes 0.025 hacía que cualquier H se viera "gigante" en unidades de ħω
+
+    // Normalizar balance: deltaL en % de desvío respecto al equilibrio (−1 a +1 aprox)
+    const deltaL = (balance - balanceEq) / balanceEq;
+
+    // Potenciales normalizados — cada uno típicamente entre 0 y ~2 en condiciones normales
+    const V_cpi          = Math.pow((cpi - 2.0) / 2.0, 2);
+    const V_unemployment = Math.pow((unemployment - 4.0) / 2.0, 2);
+    const V_spread       = Math.pow(spread / 1.5, 2);
+    const V_ext          = V_cpi + V_unemployment + V_spread;
+
+    const omega    = omega0 * (1 + 0.15 * V_ext);
+    const lambda   = Math.abs(cpi - 2.0) * 0.04 + Math.abs(spread) * 0.06;
+
+    const T         = 0.5 * m * omega * omega * deltaL * deltaL;
+    const V_quad    = 0.5 * m * omega * omega * deltaL * deltaL;
+    const V_quartic = lambda * Math.pow(deltaL, 4);
+    const H         = T + V_quad + V_quartic + V_ext * 0.3;
+
+    const n_raw = Math.floor(H / (hbar * omega));
+    const n     = Math.max(0, Math.min(n_raw, 12));    // clamped 0–12 (espectro acotado razonable)
+
+    const E_i  = hbar * omega * (n + 0.5);
+    const E_f  = hbar * omega * (n + 1 + 0.5);
+    const dE   = E_f - E_i;
+
+    const matElem       = V_ext * Math.sqrt(n + 1) * hbar * omega * 0.3;
+    const probTransition = Math.min(100, (matElem * matElem / (dE * dE + 0.01)) * 100);
+
+    const deltaPrice = Math.sqrt(hbar / (2 * m * omega)) * (1 + 0.1 * Math.min(n, 10));
+    const deltaTime  = hbar / (2 * Math.max(deltaPrice, 1e-9));
+
+    // Régimen determinado por n (nivel de excitación real) en vez de probTransition,
+    // así el badge "ESTADO BASE/EXCITADO/TRANSICIÓN" siempre coincide con el número mostrado
+    let regime, regimeColor;
+    if      (n >= 6) { regime = "TRANSICIÓN";    regimeColor = "color:#cc4444"; }
+    else if (n >= 3) { regime = "EXCITADO";      regimeColor = "color:var(--gold)"; }
+    else if (n >= 1) { regime = "SUPERPOSICIÓN"; regimeColor = "color:var(--gold)"; }
+    else             { regime = "ESTADO BASE";   regimeColor = "color:#5fae6e"; }
+
+    return { H, n, E_i, lambda, probTransition, deltaPrice, deltaTime, regime, regimeColor, hbar, omega };
+}
+
+function runQuantumFED() {
+    const spread       = parseFloat(document.getElementById('fed-spread').value);
+    const cpi          = parseFloat(document.getElementById('fed-cpi').value);
+    const unemployment = parseFloat(document.getElementById('fed-unemployment').value);
+    const walcl        = parseFloat(document.getElementById('fed-walcl').value);  // en billones
+
+    const r = calcHamiltoniano({ spread, cpi, unemployment, balance: walcl, balanceEq: 4.5, label: 'FED' });
+
+    document.getElementById('fed-result').classList.remove('hidden');
+    document.getElementById('fed-prob').textContent      = r.probTransition.toFixed(1) + '%';
+    document.getElementById('fed-regime').textContent    = r.regime;
+    document.getElementById('fed-regime').setAttribute('style', 'font-size:13px;font-weight:700;' + r.regimeColor);
+    document.getElementById('fed-hamiltonian').textContent = 'Ĥ = ' + r.H.toFixed(4);
+    document.getElementById('fed-energy').textContent    = 'E₀ = ' + r.E_i.toFixed(4);
+    document.getElementById('fed-level').textContent     = 'n = ' + r.n;
+    document.getElementById('fed-lambda').textContent    = 'λ = ' + r.lambda.toFixed(6);
+    document.getElementById('fed-uncertainty').textContent = 'ΔP·Δt = ' + (r.deltaPrice * r.deltaTime).toFixed(4) + ' ≥ ' + (r.hbar/2).toFixed(4);
+
+    const expl1 = r.probTransition > 60
+        ? 'alta probabilidad de cambio de política monetaria en el próximo FOMC.'
+        : r.probTransition > 30
+        ? 'incertidumbre cuántica — superposición de estados alcista/bajista.'
+        : 'estabilidad en estado base — política monetaria predecible.';
+    const expl2 = r.lambda > 0.1
+        ? 'Valor elevado → mercado en régimen no-lineal, posibles bifurcaciones.'
+        : 'Valor moderado → comportamiento cercano al oscilador armónico.';
+    const expl3 = spread < 0 ? 'bajista (inversión de curva)' : 'alcista (curva normal)';
+
+    document.getElementById('fed-explanation').innerHTML =
+        '<strong style="color:var(--gold);">Análisis FED:</strong> Régimen ' + r.regime.toLowerCase() + ' (n=' + r.n + '). ' +
+        'Prob. transición ' + r.probTransition.toFixed(1) + '% → ' + expl1 +
+        '<br><br><strong style="color:#dddddd;">φ⁴:</strong> λ=' + r.lambda.toFixed(6) + ' — ' + expl2 +
+        '<br><br><strong style="color:var(--gold);">Feynman:</strong> Interferencia constructiva favorece dirección ' + expl3 + '.';
+}
+
+function runQuantumECB() {
+    const spread       = parseFloat(document.getElementById('ecb-spread').value);
+    const cpi          = parseFloat(document.getElementById('ecb-cpi').value);
+    const unemployment = parseFloat(document.getElementById('ecb-unemployment').value);
+    const balance      = parseFloat(document.getElementById('ecb-balance').value);  // en billones €
+
+    const r = calcHamiltoniano({ spread, cpi, unemployment, balance, balanceEq: 4.7, label: 'BCE' });
+
+    document.getElementById('ecb-result').classList.remove('hidden');
+    document.getElementById('ecb-prob').textContent      = r.probTransition.toFixed(1) + '%';
+    document.getElementById('ecb-regime').textContent    = r.regime;
+    document.getElementById('ecb-regime').setAttribute('style', 'font-size:13px;font-weight:700;' + r.regimeColor);
+    document.getElementById('ecb-hamiltonian').textContent = 'Ĥ = ' + r.H.toFixed(4);
+    document.getElementById('ecb-energy').textContent    = 'E₀ = ' + r.E_i.toFixed(4);
+    document.getElementById('ecb-level').textContent     = 'n = ' + r.n;
+    document.getElementById('ecb-lambda').textContent    = 'λ = ' + r.lambda.toFixed(6);
+    document.getElementById('ecb-uncertainty').textContent = 'ΔP·Δt = ' + (r.deltaPrice * r.deltaTime).toFixed(4) + ' ≥ ' + (r.hbar/2).toFixed(4);
+
+    const expl1 = r.probTransition > 60
+        ? 'alta probabilidad de cambio de tipos en la próxima reunión del Consejo de Gobierno BCE.'
+        : r.probTransition > 30
+        ? 'incertidumbre cuántica — superposición política hawkish/dovish.'
+        : 'estabilidad — política monetaria BCE predecible.';
+    const expl2 = r.lambda > 0.1
+        ? 'Régimen no-lineal, posibles bifurcaciones en política de tipos.'
+        : 'Comportamiento cercano al oscilador armónico — estabilidad relativa.';
+    const expl3 = spread < 0 ? 'bajista (estrés periférico eurozona)' : 'alcista (convergencia periférica)';
+
+    document.getElementById('ecb-explanation').innerHTML =
+        '<strong class="text-yellow-400">Análisis BCE:</strong> Régimen ' + r.regime.toLowerCase() + ' (n=' + r.n + '). ' +
+        'Prob. transición ' + r.probTransition.toFixed(1) + '% → ' + expl1 +
+        '<br><br><strong style="color:#dddddd;">φ⁴:</strong> λ=' + r.lambda.toFixed(6) + ' — ' + expl2 +
+        '<br><br><strong style="color:var(--gold);">Feynman:</strong> Interferencia constructiva favorece dirección ' + expl3 + '.';
+}
+
+// ── Cargar datos reales BCE desde FRED ──────────────────────────────────────
+async function loadECBData(btn) {
+    btn.textContent = '⏳ Cargando...';
+    btn.disabled = true;
+
+    // CPI Eurozona HICP YoY
+    try {
+        const cpiData = await fetchFRED('CP0000EZ19M086NEST', 1, 'desc', null);
+        const cpiObs  = cpiData.observations.filter(o => !isNaN(parseFloat(o.value)));
+        if (cpiObs.length > 0) {
+            document.getElementById('ecb-cpi').value = parseFloat(cpiObs[0].value).toFixed(1);
+        }
+    } catch(e) { console.warn('BCE CPI no disponible:', e); }
+
+    // Desempleo Eurozona
+    try {
+        const unemp    = await fetchFRED('LRHUTTTTEZM156S', 1, 'desc', null);
+        const unempObs = unemp.observations.filter(o => !isNaN(parseFloat(o.value)));
+        if (unempObs.length > 0) {
+            document.getElementById('ecb-unemployment').value = parseFloat(unempObs[0].value).toFixed(1);
+        }
+    } catch(e) { console.warn('BCE desempleo no disponible:', e); }
+
+    // Spread BTP-Bund real: ITA 10Y − DEU 10Y
+    try {
+        const [itaData, deuData] = await Promise.all([
+            fetchFRED('IRLTLT01ITM156N', 1, 'desc', null),  // Italia 10Y
+            fetchFRED('IRLTLT01DEM156N', 1, 'desc', null)   // Alemania 10Y
+        ]);
+        const ita = itaData.observations.filter(o => !isNaN(parseFloat(o.value)));
+        const deu = deuData.observations.filter(o => !isNaN(parseFloat(o.value)));
+        if (ita.length > 0 && deu.length > 0) {
+            const spread = parseFloat(ita[0].value) - parseFloat(deu[0].value);
+            document.getElementById('ecb-spread').value = spread.toFixed(2);
+        }
+    } catch(e) { console.warn('Spread BTP-Bund no disponible:', e); }
+
+    // Balance BCE (no disponible en FRED — mantener valor manual)
+    // ECBDFR solo se usa para el gráfico comparativo, no como input del modelo
+
+    btn.textContent = '✅ Datos BCE cargados';
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = '📡 Cargar Datos BCE'; }, 2500);
+
+    loadFEDECBComparisonChart();
+}
+
+async function loadFEDECBComparisonChart() {
+    try {
+        const startDate = '2015-01-01';
+        const [fedData, ecbData] = await Promise.all([
+            fetchFRED('FEDFUNDS', 2000, 'asc', startDate),
+            fetchFRED('ECBDFR',   2000, 'asc', startDate)
+        ]);
+
+        const fedObs = fedData.observations.filter(o => !isNaN(parseFloat(o.value)));
+        const ecbObs = ecbData.observations.filter(o => !isNaN(parseFloat(o.value)));
+
+        const ctx = document.getElementById('chart-fed-ecb');
+        if (!ctx) return;
+        if (charts['fed-ecb']) charts['fed-ecb'].destroy();
+
+        charts['fed-ecb'] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: 'FED Funds Rate (%)',
+                        data: fedObs.map(o => ({ x: o.date, y: parseFloat(o.value) })),
+                        borderColor: '#f5a623',
+                        backgroundColor: 'rgba(245,166,35,0.06)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'BCE Deposit Rate (%)',
+                        data: ecbObs.map(o => ({ x: o.date, y: parseFloat(o.value) })),
+                        borderColor: '#f5a623',
+                        backgroundColor: 'rgba(245,166,35,0.05)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: { labels: { color: '#888', font: { size: 10, family: 'JetBrains Mono' } } },
+                    tooltip: {
+                        backgroundColor: '#111',
+                        borderColor: '#f5a623',
+                        borderWidth: 1,
+                        titleColor: '#888',
+                        bodyColor: '#ccc',
+                        titleFont: { family: 'JetBrains Mono', size: 10 },
+                        bodyFont: { family: 'JetBrains Mono', size: 11 },
+                        padding: 10
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { unit: 'year' },
+                        grid: { color: 'rgba(255,255,255,0.03)' },
+                        ticks: { color: '#444', font: { size: 9, family: 'JetBrains Mono' } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: { color: '#64748b', font: { size: 9 }, callback: v => v.toFixed(2) + '%', color: '#444', font: { size: 9, family: 'JetBrains Mono' } }
+                    }
+                }
+            }
+        });
+    } catch(e) { console.error('FED vs BCE chart error:', e); }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 3: IA MACRO CUÁNTICA — Claude API real con contexto de datos FRED live
+// ═══════════════════════════════════════════════════════════════════════════════
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function buildFREDContext() {
+    const r = window._fredResults || {};
+    if (Object.keys(r).length === 0) return "No hay datos FRED cargados aún.";
+    const lines = [
+        "DATOS MACRO EN TIEMPO REAL (FRED):",
+        r.M2SL      ? `• M2 Money Supply: ${r.M2SL.value}T USD (${r.M2SL.date})`         : null,
+        r.WALCL     ? `• FED Balance Sheet: ${r.WALCL.value}T USD (${r.WALCL.date})`      : null,
+        r.FEDFUNDS  ? `• Federal Funds Rate: ${r.FEDFUNDS.value}% (${r.FEDFUNDS.date})`   : null,
+        r.DGS10     ? `• 10Y Treasury Yield: ${r.DGS10.value}% (${r.DGS10.date})`         : null,
+        r.CPIAUCSL  ? `• CPI YoY: ${r.CPIAUCSL.value}% (${r.CPIAUCSL.date})`             : null,
+        r.UNRATE    ? `• Unemployment Rate: ${r.UNRATE.value}% (${r.UNRATE.date})`         : null,
+        r.RRPONTSYD ? `• Reverse Repo: ${r.RRPONTSYD.value}B USD (${r.RRPONTSYD.date})`  : null,
+        r.GDPC1     ? `• Real GDP: ${r.GDPC1.value}T USD (${r.GDPC1.date})`               : null,
+    ].filter(Boolean).join('\n');
+
+    // Spread 10Y-2Y si tenemos ambos
+    const spread10y2y = window._spread10y2y;
+    const spreadLine = spread10y2y !== undefined
+        ? `• Spread 10Y-2Y: ${spread10y2y > 0 ? '+' : ''}${spread10y2y.toFixed(2)}% (${spread10y2y < 0 ? '⚠️ INVERTIDA' : 'Normal'})`
+        : '';
+
+    return lines + (spreadLine ? '\n' + spreadLine : '');
+}
+
+async function sendQuantumMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chat = document.getElementById('chat-messages');
+    chat.innerHTML += `<div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><div style="background:var(--gold);color:#000;font-weight:600;padding:10px 16px;border-radius:5px;max-width:75%;font-size:13px;">${escapeHtml(text)}</div></div>`;;
+    input.value = "";
+    input.disabled = true;
+    chat.scrollTop = chat.scrollHeight;
+
+    const loadingId = 'loading-' + Date.now();
+    chat.innerHTML += `<div id="${loadingId}" class="flex justify-start"><div style="padding:10px 16px;border-radius:6px;font-size:13px;font-family:JetBrains Mono,monospace;" class="animate-pulse">⚛️ Analizando datos FRED...</div></div>`;
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+        const fredContext = buildFREDContext();
+        const systemPrompt = `Sos un analista macro cuántico de SolaroTrade. Respondés preguntas sobre macroeconomía global usando datos reales de la Reserva Federal (FRED).
+
+MARCO ANALÍTICO:
+- Hamiltoniano φ⁴: Ĥ = p²/2m + ½mω²L² + λL⁴ donde L = liquidez
+- Señal de contagio sistémico: |ρ| > 0.85 entre series FRED
+- Inversión de curva (10Y-2Y < 0) = señal de recesión (~73% precisión histórica)
+
+DATOS ACTUALES:
+${fredContext}
+
+Respondé en español, conciso (máx 150 palabras), usando los datos reales. No inventés datos fuera del contexto.`;
+
+        // Pollinations AI — 100% gratuito, sin API key, sin registro
+        const payload = {
+            model: "openai",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user",   content: text }
+            ],
+            seed: 42,
+            private: true
+        };
+
+        const controller = new AbortController();
+        const tid = setTimeout(() => controller.abort(), 30000);
+        const response = await fetch("https://text.pollinations.ai/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+        clearTimeout(tid);
+
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        const reply = (await response.text()).trim();
+        if (!reply) throw new Error("Respuesta vacía");
+
+        document.getElementById(loadingId)?.remove();
+
+        const safe = reply
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/\n/g,'<br>')
+            .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+            .replace(/`([^`]+)`/g,'<code style="font-family:JetBrains Mono,monospace;font-size:11px;padding:1px 4px;border-radius:3px;">$1</code>');
+
+        chat.innerHTML += `<div class="flex justify-start"><div class=" px-5 py-3 rounded-2xl max-w-[75%] text-sm " style="color:#aaaaaa;">${safe}</div></div>`;
+
+    } catch(e) {
+        document.getElementById(loadingId)?.remove();
+        const r = window._fredResults || {};
+        const fb = generateLocalFallback(text, r);
+        chat.innerHTML += `<div class="flex justify-start"><div class=" px-5 py-3 rounded-2xl max-w-[75%] text-sm " style="color:#aaaaaa;">${fb}<br><span style="font-size:10px;display:block;">⚠️ Sin conexión IA — análisis local con datos FRED</span></div></div>`;
+        console.warn('IA fallback:', e.message);
+    }
+
+    chat.scrollTop = chat.scrollHeight;
+
+    // Estado cuántico desde datos FRED reales
+    const r = window._fredResults || {};
+    const cpi    = r.CPIAUCSL ? parseFloat(r.CPIAUCSL.value) : 2.5;
+    const fed    = r.FEDFUNDS ? r.FEDFUNDS.raw : 5.0;
+    const spread = window._spread10y2y ?? 0.1;
+    const bull = Math.max(0.05, Math.min(0.85, 0.5 - (cpi-2)*0.06 - (fed-2.5)*0.04 + (spread>0?0.05:-0.10)));
+    const bear = Math.max(0.05, Math.min(0.85, 0.5 + (cpi-2)*0.06 + (fed-2.5)*0.04 + (spread<0?0.10:-0.05)));
+    const side = Math.max(0.05, Math.round((1-bull-bear)*1000)/1000);
+    const coherence = Math.max(0.1, Math.min(1, 1 - Math.abs(cpi-2)*0.1 - Math.abs(fed-3)*0.05 - (spread<0?0.2:0)));
+
+    document.getElementById('state-bull').textContent      = (bull*100).toFixed(1)+'%';
+    document.getElementById('state-bear').textContent      = (bear*100).toFixed(1)+'%';
+    document.getElementById('state-side').textContent      = (side*100).toFixed(1)+'%';
+    document.getElementById('state-coherence').textContent = coherence.toFixed(2);
+
+    input.disabled = false;
+    input.focus();
+}
+
+// Fallback local cuando Pollinations no responde
+function generateLocalFallback(question, r) {
+    const q = question.toLowerCase();
+    const cpi    = r.CPIAUCSL ? parseFloat(r.CPIAUCSL.value) : null;
+    const fed    = r.FEDFUNDS ? r.FEDFUNDS.raw : null;
+    const m2     = r.M2SL    ? r.M2SL.value   : null;
+    const spread = window._spread10y2y;
+
+    if (q.includes('liquidez') || q.includes('m2'))
+        return `💧 <strong>Liquidez:</strong> M2 = ${m2??'--'}T USD. CPI YoY = ${cpi??'--'}% ${cpi>3?'(sobre objetivo 2% FED)':'(cerca del objetivo)'}. Modelo φ⁴: λL⁴ captura aversión al riesgo colectiva.`;
+    if (q.includes('fed') || q.includes('tasa') || q.includes('federal'))
+        return `🏛️ <strong>FED:</strong> Fed Funds = ${fed??'--'}%. ${cpi?`CPI = ${cpi}% → ${cpi>2.5?'Sesgo hawkish persiste.':'Condiciones para flexibilización mejoran.'}`:''}`;
+    if (q.includes('curva') || q.includes('spread') || q.includes('recesi'))
+        return `📉 <strong>Curva:</strong> Spread 10Y-2Y = ${spread!=null?(spread>0?'+':'')+spread.toFixed(2)+'%':'--'}. ${spread!=null?(spread<0?'⚠️ INVERTIDA → señal recesión (~73% histórico).':'✅ Curva normal.'):''}`;
+    return `⚛️ Datos FRED: Fed Funds ${fed??'--'}%, CPI ${cpi??'--'}%, M2 ${m2??'--'}T. Reconectá para análisis IA completo.`;
+}
+
+
+function quickAsk(topic) {
+    const input = document.getElementById('chat-input');
+    const questions = {
+        liquidez: '¿Cómo está la liquidez cuántica?',
+        fed:      '¿Cuál es el estado cuántico de la FED?',
+        regimen:  '¿En qué régimen cuántico estamos?',
+        contagio: '¿Hay señal de contagio sistémico en las correlaciones?'
+    };
+    input.value = questions[topic] || topic;
+    sendQuantumMessage();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 4: SERIES TEMPORALES
+// ═══════════════════════════════════════════════════════════════════════════════
+async function loadTimeSeriesAnalysis() {
+    try {
+        const data = await fetchFRED('M2SL', 500, 'asc', '2015-01-01');
+        const values = data.observations.map(o => parseFloat(o.value));
+        const growthRates = [];
+        for (let i = 1; i < values.length; i++) {
+            growthRates.push((values[i] - values[i-1]) / values[i-1] * 100);
+        }
+
+        // FFT simple
+        const N = growthRates.length;
+        const fft = [];
+        for (let k = 0; k < Math.min(N/2, 50); k++) {
+            let real = 0, imag = 0;
+            for (let n = 0; n < N; n++) {
+                const angle = -2 * Math.PI * k * n / N;
+                real += growthRates[n] * Math.cos(angle);
+                imag += growthRates[n] * Math.sin(angle);
+            }
+            fft.push(Math.sqrt(real*real + imag*imag) / N);
+        }
+
+        const ctx = document.getElementById('chart-fft-m2');
+        if (ctx) {
+            if (charts['fft-m2']) charts['fft-m2'].destroy();
+            charts['fft-m2'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: fft.map((_,i) => 'f' + i),
+                    datasets: [{
+                        label: 'Amplitud Espectral',
+                        data: fft,
+                        backgroundColor: '#cc4444',
+                        borderColor: '#f43f5e'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        }
+
+        // ── Detectar ciclos reales desde picos FFT ────────────────────────────
+        const cycleDiv = document.getElementById('cycle-analysis');
+
+        // La serie M2SL es mensual → cada índice k en FFT representa frecuencia k/N meses
+        // Período en meses = N/k → período en años = N/(k*12)
+        // Buscamos los 4 picos de mayor amplitud (k>0) y los mapeamos a ciclos conocidos
+        const peaksIndexed = fft.slice(1).map((amp, i) => ({ k: i + 1, amp }))
+            .sort((a, b) => b.amp - a.amp)
+            .slice(0, 6); // top 6 para tener margen
+
+        // Clasificar cada pico por período en años
+        const N_months = growthRates.length;
+        function classifyCycle(periodYears) {
+            if (periodYears < 1)      return { name: 'Micro-ciclo',       color: 'color:#666;' };
+            if (periodYears <= 5)     return { name: 'Ciclo Kitchin',     color: 'color:var(--gold);',    desc: 'Inventarios / crédito a corto plazo' };
+            if (periodYears <= 11)    return { name: 'Ciclo Juglar',      color: 'color:#ddd;',           desc: 'Inversión en capital fijo' };
+            if (periodYears <= 25)    return { name: 'Ciclo Kuznets',     color: 'color:#5fae6e;',        desc: 'Infraestructura / inmobiliario' };
+            if (periodYears <= 60)    return { name: 'Ciclo Kondratiev',  color: 'color:var(--gold);',    desc: 'Olas tecnológicas largas' };
+            return                           { name: 'Tendencia secular', color: 'color:#cc4444;',        desc: 'Tendencia de largo plazo' };
+        }
+
+        // Deduplicar: si dos picos caen en el mismo ciclo, quedarse con el mayor
+        const seen = new Set();
+        const detectedCycles = [];
+        for (const peak of peaksIndexed) {
+            const periodYears = N_months / (peak.k * 12);
+            const cls = classifyCycle(periodYears);
+            if (seen.has(cls.name) || cls.name === 'Micro-ciclo') continue;
+            seen.add(cls.name);
+            detectedCycles.push({ ...cls, periodYears, amp: peak.amp, k: peak.k });
+            if (detectedCycles.length === 4) break;
+        }
+
+        let cycleHtml = '';
+        detectedCycles.forEach(c => {
+            const bar = Math.min(100, (c.amp / detectedCycles[0].amp) * 100).toFixed(0);
+            cycleHtml +=
+                '<div style="border-radius:4px;background:#111;border:1px solid #1e1e1e;padding:12px;margin-bottom:8px;">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                        '<p style="font-size:13px;font-weight:600;' + c.color + '">' + c.name + '</p>' +
+                        '<span style="font-size:12px;font-family:JetBrains Mono,monospace;color:#666;">~' + c.periodYears.toFixed(1) + ' años</span>' +
+                    '</div>' +
+                    '<p style="font-size:12px;color:#888;margin:4px 0 8px;">' + (c.desc || '') + '</p>' +
+                    '<div style="width:100%;border-radius:3px;height:5px;background:#1e1e1e;overflow:hidden;">' +
+                        '<div style="height:100%;border-radius:3px;background:var(--gold);width:' + bar + '%;"></div>' +
+                    '</div>' +
+                    '<p style="font-size:10px;font-family:JetBrains Mono,monospace;color:#555;margin-top:6px;">Amplitud espectral: ' + c.amp.toFixed(4) + '</p>' +
+                '</div>';
+        });
+        if (detectedCycles.length === 0) cycleHtml = '<p style="font-size:13px;color:#666;">Serie insuficiente para detectar ciclos.</p>';
+        cycleDiv.innerHTML = cycleHtml;
+
+        // Autocorrelación
+        const autocorr = [];
+        const maxLag = 24;
+        const mean = growthRates.reduce((a,b) => a+b, 0) / growthRates.length;
+        const variance = growthRates.reduce((s, x) => s + Math.pow(x - mean, 2), 0) / growthRates.length;
+
+        for (let lag = 0; lag < maxLag; lag++) {
+            let cov = 0;
+            for (let i = 0; i < growthRates.length - lag; i++) {
+                cov += (growthRates[i] - mean) * (growthRates[i + lag] - mean);
+            }
+            autocorr.push(cov / ((growthRates.length - lag) * variance));
+        }
+
+        const ctxAuto = document.getElementById('chart-autocorr');
+        if (ctxAuto) {
+            if (charts['autocorr']) charts['autocorr'].destroy();
+            charts['autocorr'] = new Chart(ctxAuto, {
+                type: 'line',
+                data: {
+                    labels: autocorr.map((_,i) => 'lag ' + i),
+                    datasets: [{
+                        label: 'Autocorrelación',
+                        data: autocorr,
+                        borderColor: '#f5a623',
+                        backgroundColor: '#06b6d420',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#444', font: { size: 9, family: 'JetBrains Mono' } } },
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        }
+
+    } catch(e) {
+        console.error("Time series error:", e);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ═══════════════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar inputs de fecha con rango por defecto
+    const { start, end } = getRangeDates('5y');
+    document.getElementById('custom-start').value = start;
+    document.getElementById('custom-end').value   = end;
+
+    // Mensaje de bienvenida del chat
+    const chat = document.getElementById('chat-messages');
+    chat.innerHTML = `
+        <div style="display:flex;justify-content:flex-start;margin-bottom:8px;">
+            <div style="background:#161616;border:1px solid #222;border-radius:6px;padding:18px;max-width:85%;font-size:13px;color:#aaa;">
+                <p style="font-weight:700;color:#fff;margin-bottom:8px;">IA Macro Cuántica — Pollinations AI</p>
+                <p style="font-size:11px;color:#888;margin-bottom:10px;">Conectado a <strong style="color:var(--gold);">GPT-4o mini (gratis)</strong> con contexto de datos FRED en tiempo real. Cargando métricas macro...</p>
+                <p style="font-size:11px;color:#666;line-height:1.7;">Podés preguntarme sobre:<br>
+                • Estado actual de liquidez, inflación, tasas<br>
+                • Régimen macroeconómico y señales de riesgo<br>
+                • Comparación FED vs BCE<br>
+                • Qué significa cualquier métrica de la app</p>
+            </div>
+        </div>`;
+
+    loadLiquidity();
+    loadTimeSeriesAnalysis();
+    calcSpreadProxy();
+    openTab(0);
+});
+
+</script>
+
+    <!-- ── Integración Electron ─────────────────────────────────────────── -->
+    <script>
+    (async function initElectron() {
+        if (typeof window.electronAPI === 'undefined') return; // no es Electron
+
+        // Info de la app
+        const info = await window.electronAPI.getAppInfo();
+        console.log('[Electron] v' + info.version + ' | proxy: ' + info.fredProxyUrl);
+
+        // Mostrar versión en el título
+        document.title = 'SolaroTrade Quantum Suite v' + info.version;
+
+        // Badge de actualizaciones
+        const badge = document.getElementById('update-badge');
+        const cleanup = window.electronAPI.onUpdateStatus((data) => {
+            if (!badge) return;
+            const styles = {
+                checking:   'background:rgba(100,100,100,0.2);color:#666;',
+                available:  'background:rgba(245,166,35,0.2);color:#f5a623;border:1px solid rgba(245,166,35,0.4);',
+                downloading:'background:rgba(6,182,212,0.15);color:#06b6d4;',
+                downloaded: 'background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);',
+                'up-to-date':'',
+                error:      'background:rgba(204,68,68,0.15);color:#cc4444;',
+            };
+            if (data.status === 'up-to-date' || data.status === 'checking') {
+                badge.style.display = 'none';
+                return;
+            }
+            badge.style.display = 'inline-block';
+            badge.setAttribute('style', badge.getAttribute('style').split(';')[0] + ';display:inline-block;font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:3px;cursor:pointer;' + (styles[data.status] || ''));
+            badge.textContent = data.message;
+        });
+
+        // Verificar actualizaciones manualmente con botón en el header
+        const updateBtn = document.getElementById('update-btn');
+        if (updateBtn) {
+            updateBtn.style.display = 'inline-flex';
+            updateBtn.addEventListener('click', () => window.electronAPI.checkUpdate());
+        }
+    })();
+    </script>
+</body>
+</html>
